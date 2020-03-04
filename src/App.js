@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 import { client } from 'ontology-dapi';
+import fs from 'fs';
 
 client.registerClient({});
 
@@ -44,7 +45,13 @@ class App extends React.Component {
 
   async onSignMessage() {
 
-    const message = 'Test';
+  	const text = fs.readFileSync('./files/test-certificate.txt', 'utf8');
+
+    console.log(text);
+
+    const message = require('./files/test-certificate.txt');
+
+    console.log(message);
 
 		try {
 		const result = await client.api.message.signMessage({ message });
@@ -97,9 +104,10 @@ class App extends React.Component {
 						</tr>
 					</tbody>
 				</table>
-				<h3>View Certificates</h3>
+				<h3>Issue Certificates</h3>
 				<p>You are {this.state.name}</p>
 				<button onClick={this.onSignMessage}>Click Me</button>
+				<h3>Verify Certificates</h3>
 			</div>
 		);
 	}
