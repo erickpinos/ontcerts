@@ -3,7 +3,6 @@ import logo from './logo.svg';
 import './App.css';
 
 import { client } from 'ontology-dapi';
-import fs from 'fs';
 
 client.registerClient({});
 
@@ -45,14 +44,21 @@ class App extends React.Component {
 
   async onSignMessage() {
 
-  	const text = fs.readFileSync('./files/test-certificate.txt', 'utf8');
+    console.log('onSignMessage');
 
-    console.log(text);
+    fetch('./files/test.txt')
+		.then((r) => r.text())
+		.then((data) =>{
+			console.log(data);
+			this.state.message = data;
+	    this.setState({message: data});
+			this.signMessage(data);
+		})
 
-    const message = require('./files/test-certificate.txt');
+	}
 
-    console.log(message);
-
+	async signMessage(message) {
+		console.log(message);
 		try {
 		const result = await client.api.message.signMessage({ message });
 	//		tslint:disable-next-line:no-console
@@ -68,6 +74,26 @@ class App extends React.Component {
 		}
 	}
 
+  async onVerifyMessage() {
+    const message = 'This certificate is issued to Erick Pinos on 3/1/20 for completing Blockchain 101';
+    const data = '011293104ae3051f2ecb291fc4a6bebcea86f999b8b7efcdf4cb0c01446d7574557876607412ee8afe8bcdbfa8f68bc0fecb776f9a9ff499be6c7024b2f4901fc3';
+    const publicKey = await client.api.asset.getPublicKey();
+
+    const signature: Signature = {
+      data,
+      publicKey
+    };
+
+    try {
+      const result = await client.api.message.verifyMessage({ message, signature });
+      alert('onVerifyMessage finished, result:' + result);
+    } catch (e) {
+      alert('onVerifyMessage canceled');
+      // tslint:disable-next-line:no-console
+      console.log('onVerifyMessage error:', e);
+    }
+  }
+
   render() {
 //		if (typeof this.state.name !== 'undefined') {
 //			console.log("this.state.name: ", this.state.name);
@@ -77,7 +103,7 @@ class App extends React.Component {
 
 //		var test = this.state.name;
 
-	  if(!this.state.name){return null}
+	  if(!this.state.name){return (<div>Switch to an Issuer wallet</div>)}
 
 		return (
 			<div className="App">
@@ -108,6 +134,7 @@ class App extends React.Component {
 				<p>You are {this.state.name}</p>
 				<button onClick={this.onSignMessage}>Click Me</button>
 				<h3>Verify Certificates</h3>
+				<button onClick={this.onVerifyMessage}>Click Me</button>
 			</div>
 		);
 	}
