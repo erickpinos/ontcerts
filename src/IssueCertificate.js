@@ -10,7 +10,7 @@ var issuers = {
 	'03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e': 'MIT'
 }
 
-class IssueClaim extends React.Component {
+export default class IssueCertificate extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -19,7 +19,16 @@ class IssueClaim extends React.Component {
 			recipient: '',
 			claim: '',
 			signature: '',
-			json: ''
+			json: '',
+			certType: 'Certificate of Completion',
+			certIntro: 'This certificate is awarded to',
+			certRecipient: 'Erick Pinos',
+			certFor: 'for successfully completing the BEN lesson',
+			certTopic: 'Launch an ERC20 Token',
+			certDate: 'February 14, 2020',
+			certSignSig: 'Erick Pinos',
+			certSignName: 'Erick Pinos',
+			certSignTitle: 'President'
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -42,7 +51,7 @@ class IssueClaim extends React.Component {
 		console.log('recipient', recipient);
 		console.log('claim', claim);
 
-		const message = claim;
+		var message = claim;
 
 		try {
 			const result = await client.api.message.signMessage({ message });
@@ -82,9 +91,20 @@ class IssueClaim extends React.Component {
 	}
 
 	handleSubmit(event) {
-		alert('An claim was submitted: ' + this.state.recipient + this.state.claim);
 		event.preventDefault();
-		this.issueClaim(this.state.sender, this.state.recipient, this.state.claim);
+		var claim = {};
+		claim.certType = this.state.certType;
+		claim.certIntro = this.state.certIntro;
+		claim.certRecipient = this.state.certRecipient;
+		claim.certFor = this.state.certFor;
+		claim.certTopic = this.state.certTopic;
+		claim.certDate = this.state.certDate;
+		claim.certSignSig = this.state.certSignSig;
+		claim.certSignName = this.state.certSignName;
+		claim.certSignTitle = this.state.certSignTitle;
+		this.setState({'claim': claim});
+		alert('A claim was submitted: ' + JSON.stringify(claim));
+		this.issueClaim(this.state.sender, this.state.recipient, claim);
 	}
 
 	render() {
@@ -92,16 +112,65 @@ class IssueClaim extends React.Component {
 			<form onSubmit={this.handleSubmit}>
 
 				<div>
-					<label>Claim:</label>
+					<label>Type:</label>
 					<div>
-						<textarea name="claim" value={this.state.claim} onChange={this.handleChange} />
+						<textarea name="certType" value={this.state.certType} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Intro:</label>
+					<div>
+						<textarea name="certIntro" value={this.state.certIntro} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
 				<div>
 					<label>Recipient:</label>
 					<div>
-						<input name="recipient" value={this.state.recipient} onChange={this.handleChange} />
+						<textarea name="certRecipient" value={this.state.certRecipient} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>For:</label>
+					<div>
+						<textarea name="certFor" value={this.state.certFor} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Topic:</label>
+					<div>
+						<textarea name="certTopic" value={this.state.certTopic} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Date:</label>
+					<div>
+						<textarea name="certDate" value={this.state.certDate} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Signature:</label>
+					<div>
+						<textarea name="certSignSig" value={this.state.certSignSig} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Sign Name:</label>
+					<div>
+						<textarea name="certSignName" value={this.state.certSignName} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div>
+					<label>Sign Title:</label>
+					<div>
+						<textarea name="certSignTitle" value={this.state.certSignTitle} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
@@ -114,14 +183,6 @@ class IssueClaim extends React.Component {
 					<code>
 						<div>
 							Sender: {this.state.sender}
-						</div>
-
-						<div>
-							Recipient: {this.state.recipient}
-						</div>
-
-						<div>
-						Claim: {this.state.claim}
 						</div>
 
 						<div>
@@ -140,5 +201,3 @@ class IssueClaim extends React.Component {
 		);
 	}
 }
-
-export default IssueClaim;

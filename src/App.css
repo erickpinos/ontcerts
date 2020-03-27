@@ -41,3 +41,29 @@
 table, th, td {
     border: 1px solid black;
 }
+
+.cert {
+  background-color: #fcfff3!important;
+}
+
+.cert-type {
+  margin: 20px;
+}
+
+.cert-spacer {
+  margin: 10px;
+}
+
+.cert-sign-sig {
+  margin-bottom: 0px;
+  font-style: italic;
+}
+
+.cert-sign-name {
+  margin-bottom: 0px;
+}
+
+.cert-logo {
+  align-self: center;
+  width: 200px;
+}
