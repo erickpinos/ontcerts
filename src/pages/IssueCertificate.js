@@ -1,14 +1,11 @@
 import React from 'react';
-import './App.css';
+import '../App.css';
 
 import { client } from 'ontology-dapi';
 
-client.registerClient({});
+var profiles = require('../data/profiles.js');
 
-var issuers = {
-	'03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583': 'BEN',
-	'03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e': 'MIT'
-}
+client.registerClient({});
 
 export default class IssueCertificate extends React.Component {
 
@@ -20,6 +17,7 @@ export default class IssueCertificate extends React.Component {
 			claim: '',
 			signature: '',
 			json: '',
+			name: '',
 			certType: 'Certificate of Completion',
 			certIntro: 'This certificate is awarded to',
 			certRecipient: 'Erick Pinos',
@@ -35,14 +33,32 @@ export default class IssueCertificate extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
+	componentDidMount() {
+		this.getPublicKey();
+		this.getIssuerName();
+	}
+
 	async getPublicKey() {
 		const publicKey = await client.api.asset.getPublicKey();
 		console.log('the public key is', publicKey);
 		this.setState({sender: publicKey});
 	}
 
-	componentDidMount() {
-		this.getPublicKey();
+	async getIssuerName() {
+		console.log('getIssuerName()');
+
+		const publicKey = await client.api.asset.getPublicKey();
+		console.log('the account is', publicKey);
+
+		var issuer = '';
+
+		for (var i = 0; i in profiles; i++){
+			if (profiles[i]['publicKey'] === this.state.sender) {
+				this.setState({name: profiles[i]['name']});
+				console.log('this.state.name set to', this.state.name);
+			}
+		}
+
 	}
 
 	async issueClaim(sender, recipient, claim) {
@@ -58,7 +74,7 @@ export default class IssueCertificate extends React.Component {
 
       console.log('signature:', result);
 
-			var issuer = issuers[result['publicKey']];
+			var issuer = profiles[result['publicKey']];
 
 			console.log('claim signed by ' + issuer);
 			console.log('signature:', result);
@@ -108,7 +124,13 @@ export default class IssueCertificate extends React.Component {
 	}
 
 	render() {
+		if(!this.state.name){return (<div>Loading</div>)}
+
 		return (
+			<div>
+			<h3>Issue Certificates</h3>
+			<p>You are {this.state.name}</p>
+			<div className="row justify-content-center">
 			<form onSubmit={this.handleSubmit}>
 
 				<div>
@@ -198,6 +220,8 @@ export default class IssueCertificate extends React.Component {
 					</div>
 				</div>
 			</form>
+			</div>
+			</div>
 		);
 	}
 }

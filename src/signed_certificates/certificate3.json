@@ -1,1 +1,9 @@
-{"sender":"03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583","recipient":"","claim":"{\"certType\":\"Certificate of Completion\",\"certIntro\":\"This certificate is awarded to\",\"certRecipient\":\"Erick Pinos\",\"certFor\":\"for successfully completing the BEN lesson\",\"certTopic\":\"Launch an ERC20 Token\",\"certDate\":\"February 14, 2020\",\"certSignSig\":\"Erick Pinos\",\"certSignName\":\"Erick Pinos\",\"certSignTitle\":\"President\"}","signature":{"data":"014a1668a54d932e2023db088ce2516f140f6f18860c067df9d2a7e4f82c06302e12c986dc05c4b75eb8afc3c6db013f63fe0d3c053c5b25449c6907e20108d258","publicKey":"03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583"}}
+{
+  "sender": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
+  "recipient": "",
+  "claim": "{\"certType\":\"Certificate of Completion\",\"certIntro\":\"This certificate is awarded to\",\"certRecipient\":\"Erick Pinos\",\"certFor\":\"for successfully completing the BEN lesson\",\"certTopic\":\"Launch an ERC20 Token\",\"certDate\":\"February 14, 2020\",\"certSignSig\":\"Erick Pinos\",\"certSignName\":\"Erick Pinos\",\"certSignTitle\":\"President\"}",
+  "signature": {
+    "data": "014a1668a54d932e2023db088ce2516f140f6f18860c067df9d2a7e4f82c06302e12c986dc05c4b75eb8afc3c6db013f63fe0d3c053c5b25449c6907e20108d258",
+    "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583"
+  }
+}
