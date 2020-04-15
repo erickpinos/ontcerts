@@ -23,13 +23,20 @@ export default class YourProfile extends React.Component {
 
 	async getProfile() {
 
-      const account = await client.api.asset.getAccount();
-      console.log('account', account);
-  		this.setState({account: account});
 
-  		const publicKey = await client.api.asset.getPublicKey();
-  		console.log('publicKey', publicKey);
-  		this.setState({publicKey: publicKey});
+		const params = {
+		    dappName: 'My dapp',
+		    dappIcon: '' // some url points to the dapp icon
+		}
+
+		try {
+		    const res = await client.api.asset.getAccount(params);
+		    console.log(res)
+				console.log('account', res);
+	  		this.setState({account: res});
+		} catch(err) {
+		    console.log(err)
+		}
 
   		for (let i = 0; i < profiles.length; i++) {
   				if (profiles[i]['account'] === account) {
