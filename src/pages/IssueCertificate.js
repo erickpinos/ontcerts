@@ -34,31 +34,28 @@ export default class IssueCertificate extends React.Component {
 	}
 
 	componentDidMount() {
-		this.getPublicKey();
+		this.getAccount();
 		this.getIssuerName();
 	}
 
-	async getPublicKey() {
-		const publicKey = await client.api.asset.getPublicKey();
-		console.log('the public key is', publicKey);
-		this.setState({sender: publicKey});
+	async getAccount() {
+		const account = await client.api.asset.getAccount();
+		console.log('account', account);
+		this.setState({sender: account});
 	}
 
 	async getIssuerName() {
-		console.log('getIssuerName()');
 
-		const publicKey = await client.api.asset.getPublicKey();
-		console.log('the account is', publicKey);
+		const account = await client.api.asset.getAccount();
+		console.log('account', account);
 
-		var issuer = '';
-
-		for (var i = 0; i in profiles; i++){
-			if (profiles[i]['publicKey'] === this.state.sender) {
-				this.setState({name: profiles[i]['name']});
-				console.log('this.state.name set to', this.state.name);
+		for (let i = 0; i < profiles.length; i++) {
+			if (profiles[i]['account'] === this.state.sender) {
+				this.setState({
+					name: profiles[i].name,
+				});
 			}
 		}
-
 	}
 
 	async issueClaim(sender, recipient, claim) {
@@ -130,73 +127,72 @@ export default class IssueCertificate extends React.Component {
 			<div>
 			<h3>Issue Certificates</h3>
 			<p>You are {this.state.name}</p>
-			<div className="row justify-content-center">
 			<form onSubmit={this.handleSubmit}>
 
-				<div>
+				<div className="form-group">
 					<label>Type:</label>
 					<div>
 						<textarea name="certType" value={this.state.certType} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Intro:</label>
 					<div>
 						<textarea name="certIntro" value={this.state.certIntro} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Recipient:</label>
 					<div>
 						<textarea name="certRecipient" value={this.state.certRecipient} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>For:</label>
 					<div>
 						<textarea name="certFor" value={this.state.certFor} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Topic:</label>
 					<div>
 						<textarea name="certTopic" value={this.state.certTopic} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Date:</label>
 					<div>
 						<textarea name="certDate" value={this.state.certDate} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Signature:</label>
 					<div>
 						<textarea name="certSignSig" value={this.state.certSignSig} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Sign Name:</label>
 					<div>
 						<textarea name="certSignName" value={this.state.certSignName} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<label>Sign Title:</label>
 					<div>
 						<textarea name="certSignTitle" value={this.state.certSignTitle} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
-				<div>
+				<div className="form-group">
 					<input type="submit" value="Submit" />
 				</div>
 
@@ -219,8 +215,7 @@ export default class IssueCertificate extends React.Component {
 						{JSON.stringify(this.state.json)}
 					</div>
 				</div>
-			</form>
-			</div>
+		</form>
 			</div>
 		);
 	}
