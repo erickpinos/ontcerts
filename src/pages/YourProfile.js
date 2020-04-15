@@ -31,12 +31,12 @@ export default class YourProfile extends React.Component {
 
 		try {
 		    const res = await client.api.asset.getAccount(params);
-		    console.log(res)
-				console.log('account', res);
-	  		this.setState({account: res});
+		    console.log(res.result)
+				console.log('account', res.result);
+	  		this.setState({account: res.result});
 
 				for (let i = 0; i < profiles.length; i++) {
-	  				if (profiles[i]['account'] === res) {
+	  				if (profiles[i]['account'] === res.result) {
 	  					this.setState({
 	  						name: profiles[i].name,
 	  						email: profiles[i].email,
