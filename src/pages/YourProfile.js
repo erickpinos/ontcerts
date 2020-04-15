@@ -34,19 +34,21 @@ export default class YourProfile extends React.Component {
 		    console.log(res)
 				console.log('account', res);
 	  		this.setState({account: res});
+
+				for (let i = 0; i < profiles.length; i++) {
+	  				if (profiles[i]['account'] === res) {
+	  					this.setState({
+	  						name: profiles[i].name,
+	  						email: profiles[i].email,
+	  						image: profiles[i].image
+	  					});
+	  				}
+	  		}
+
 		} catch(err) {
 		    console.log(err)
 		}
 
-  		for (let i = 0; i < profiles.length; i++) {
-  				if (profiles[i]['account'] === account) {
-  					this.setState({
-  						name: profiles[i].name,
-  						email: profiles[i].email,
-  						image: profiles[i].image
-  					});
-  				}
-  		}
 
   	}
 
