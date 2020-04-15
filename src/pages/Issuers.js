@@ -1,7 +1,7 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'ontology-dapi';
+import { client } from 'cyanobridge';
 
 var profiles = require('../data/profiles.js');
 

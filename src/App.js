@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import { client } from 'ontology-dapi';
+import { client } from 'cyanobridge';
 import { Router, Route, Switch, NavLink } from 'react-router-dom';
 
 import history from './utils/history';
