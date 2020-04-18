@@ -1,0 +1,9 @@
+{
+  "sender": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
+  "recipient": "Test",
+  "claim": "Test",
+  "signature": {
+    "data": "013c0d1c852ae7a803181c41a042cf5dc44668a01979aaadd96ad6d45a432cdb151c128bc5eaaa6e1a3a911302906c83501596b4847147de087dda352ff2c649d1",
+    "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583"
+  }
+}

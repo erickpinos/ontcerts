@@ -1,9 +1,9 @@
 {
-  "sender": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
-  "recipient": "Test",
-  "claim": "Test",
+  "sender": "03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e",
+  "recipient": "Erick",
+  "claim": "To Erick Pinos for completing Blockchain 101 on Tuesday Mar 17th.",
   "signature": {
-    "data": "013c0d1c852ae7a803181c41a042cf5dc44668a01979aaadd96ad6d45a432cdb151c128bc5eaaa6e1a3a911302906c83501596b4847147de087dda352ff2c649d1",
-    "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583"
+    "data": "0135d92ddfcd0268b5c91d048530525877a433739b74dde86be41bd3c84da323353003cda3d447b393437776fa5ef65e19255e7a6451d037e4f0c3eb02b525fa90",
+    "publicKey": "03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e"
   }
 }

@@ -1,16 +1,28 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'cyanobridge';
+import { client } from 'ontology-dapi';
 
 import benLogo from '../images/ben-logo.png';
+
+import Certificate from '../components/Certificate.js';
 
 var profiles = require('../data/profiles.js');
 
 client.registerClient({});
 
+var certificates = [];
 
-var certificate3 = require("../signed_certificates/certificate3.json");
+for (let i = 0; i < 3; i++) {
+	try {
+		var certificate = require("../signed_certificates/certificate" + i + ".json");
+		certificates.push(certificate);
+	} catch(e) {
+		console.log(e);
+	}
+}
+
+console.log('certificates', certificates);
 
 export default class IssueCertificate extends React.Component {
 
@@ -36,6 +48,9 @@ export default class IssueCertificate extends React.Component {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+
+		this.onVerifyMessage = this.onVerifyMessage.bind(this);
+
 	}
 
 	async getPublicKey() {
@@ -47,16 +62,18 @@ export default class IssueCertificate extends React.Component {
 	componentDidMount() {
 		this.getPublicKey();
 
-    this.getCertificate('./signed_certificates/certificate3.json');
+//    this.getCertificate('./signed_certificates/certificate3.json');
 	}
 
+/*
   getCertificate(certificateURL) {
 		fetch(certificateURL)
 		.then((response) => response.text())
 		.then((data) =>{
 //			console.log(data);
-			var certificate = certificate3;
-			certificate.claim = JSON.parse(certificate3.claim);
+			var certificates = ['1'];
+			var certificate = certificates[2];
+			certificate.claim = JSON.parse(certificates[2].claim);
 			var certificates = this.state.certificates;
 			certificates.push(certificate);
 			this.setState({certificates: certificates});
@@ -67,7 +84,7 @@ export default class IssueCertificate extends React.Component {
 			console.log(certificatethis.recipient);
 		})
 	}
-
+*/
 	async issueClaim(sender, recipient, claim) {
 		console.log('issueClaim()');
 		console.log('sender', sender);
@@ -130,64 +147,43 @@ export default class IssueCertificate extends React.Component {
 		this.issueClaim(this.state.sender, this.state.recipient, claim);
 	}
 
+	async onVerifyMessage(message, publicKey, data) {
+
+		const signature: Signature = {
+			data,
+			publicKey
+		};
+
+		try {
+			const result = await client.api.message.verifyMessage({ message, signature });
+			alert('onVerifyMessage finished, result:' + result);
+			if (result == true) {
+				this.setState({verified: 'verified'});
+				var profile = profiles[publicKey];
+				this.setState({verifiedFrom: profile});
+			}
+		} catch (e) {
+			alert('onVerifyMessage canceled');
+			// tslint:disable-next-line:no-console
+			console.log('onVerifyMessage error:', e);
+		}
+	}
+
+
 	render() {
 
-    if(!this.state.certificates[0]){return (<div>No certificate detected.</div>)}
+    if(!certificates[0]){return (<div>No certificates detected.</div>)}
 
 		return (
 			<div>
 
-
       <h3>Verify Certificates</h3>
 
-{/*
-    <div className="row justify-content-center">
-      <div className="col-lg-6 col-10">
-        <div className="card">
-        <div className="card-body">
-        <h5>Massachusetts Institute of Technology</h5>
-        <p className="cert-intro">Upon the recommendation of the faculty hereby confers on</p>
-        <p className="cert-recipient">Erick Jose Pinos</p>
-        <p>The Degree of</p>
-        <p className="cert-type">Bachelor of Science</p>
-        <p>in</p>
-        <p className="cert-topic">Management</p>
-        <p>In recognition of proficency in the general and the special studies and exercises prescribed by said institute for such degree given this day under teh seal of the Institute at Cambridge in the Commwealth of Massachusetts</p>
-        <p className="cert-date">February 21, 2018</p>
-        <p>R Margery Morgan</p>
-        <p>Secretary</p>
-        <p className="cert-sign-sig">Rafael Reif</p>
-        <p className="cert-sign-title">President</p>
-        <img className="cert-logo" src={mitLogo} />
+			<div class='certificates'>
 
-        </div>
-        <button onClick={() => this.onVerifyMessage(this.state.certificates[1]['claim'],this.state.certificates[1]['signature']['publicKey'],this.state.certificates[1]['signature']['data'])}>Verify Certificate 2</button>
-        <p>This certificate is {this.state.verified} from {this.state.verifiedFrom}</p>
-        </div>
-      </div>
-    </div>
-*/}
-    <div className="row justify-content-center">
-      <div className="col-lg-6 col-10">
-        <div className="card cert">
-        <div className="card-body">
-          <img className="cert-logo" src={benLogo} />
-          <h3 className="cert-type">{this.state.certificates[0].claim['certType']}</h3>
-          <p className="cert-intro">{this.state.certificates[0].claim['certIntro']}</p>
-          <h4 className="cert-recipient">{this.state.certificates[0].claim['certRecipient']}</h4>
-          <p className="cert-for">{this.state.certificates[0].claim['certFor']}</p>
-          <h4 className="cert-topic">{this.state.certificates[0].claim['certTopic']}</h4>
-          <p className="cert-date">{this.state.certificates[0].claim['certDate']}</p>
-          <p className="cert-spacer"></p>
-          <h4 className="cert-sign-sig">{this.state.certificates[0].claim['certSignSig']}</h4>
-          <p className="cert-sign-name">{this.state.certificates[0].claim['certSignName']}</p>
-          <p className="cert-sign-title">{this.state.certificates[0].claim['certSignTitle']}</p>
-        <button onClick={() => this.onVerifyMessage(JSON.stringify(this.state.certificates[0]['claim']),this.state.certificates[0]['signature']['publicKey'],this.state.certificates[0]['signature']['data'])}>Verify Certificate 2</button>
-        <p>This certificate is {this.state.verified} from {this.state.verifiedFrom}</p>
-        </div>
-        </div>
-      </div>
-    </div>
+				{certificates.map(certificate => <Certificate key={certificate.recipient} certificate={certificate} />)}
+
+			</div>
 
 			</div>
 		);

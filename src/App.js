@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import { client } from 'cyanobridge';
+import { client } from 'ontology-dapi';
 import { Router, Route, Switch, NavLink } from 'react-router-dom';
 
 import history from './utils/history';
@@ -34,8 +34,6 @@ export default class App extends React.Component {
 		}
 
 		this.onSignMessage = this.onSignMessage.bind(this);
-		this.onVerifyMessage = this.onVerifyMessage.bind(this);
-
 	}
 
 
@@ -66,28 +64,6 @@ export default class App extends React.Component {
 			alert('onSignMessage canceled');
 	//		tslint:disable-next-line:no-console
 			console.log('onSignMessage error:', e);
-		}
-	}
-
-	async onVerifyMessage(message, publicKey, data) {
-
-		const signature: Signature = {
-			data,
-			publicKey
-		};
-
-		try {
-			const result = await client.api.message.verifyMessage({ message, signature });
-			alert('onVerifyMessage finished, result:' + result);
-			if (result == true) {
-				this.setState({verified: 'verified'});
-				var profile = profiles[publicKey];
-				this.setState({verifiedFrom: profile});
-			}
-		} catch (e) {
-			alert('onVerifyMessage canceled');
-			// tslint:disable-next-line:no-console
-			console.log('onVerifyMessage error:', e);
 		}
 	}
 

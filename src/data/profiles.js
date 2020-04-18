@@ -1,6 +1,7 @@
 module.exports =  [
   {
     "account": "ATRTKMGPyFZ19XyKmN8yATsHtv5AKpcCZa",
+    "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
     "name": "BEN",
     "email": "contact@blockchainedu.org",
     "image": require('../images/ben-logo.png')

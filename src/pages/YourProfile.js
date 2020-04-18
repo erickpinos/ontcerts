@@ -1,7 +1,7 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'cyanobridge';
+import { client } from 'ontology-dapi';
 
 var profiles = require('../data/profiles.js');
 
@@ -23,7 +23,30 @@ export default class YourProfile extends React.Component {
 
 	async getProfile() {
 
+		// If web
 
+		try {
+		    const res = await client.api.asset.getAccount();
+		    console.log(res)
+				console.log('account', res);
+	  		this.setState({account: res});
+
+				for (let i = 0; i < profiles.length; i++) {
+	  				if (profiles[i]['account'] === res) {
+	  					this.setState({
+	  						name: profiles[i].name,
+	  						email: profiles[i].email,
+								publicKey: profiles[i].publicKey,
+	  						image: profiles[i].image
+	  					});
+	  				}
+	  		}
+
+		} catch(err) {
+		    console.log(err)
+		}
+/*
+		// If mobile
 		const params = {
 		    dappName: 'My dapp',
 		    dappIcon: '' // some url points to the dapp icon
@@ -49,7 +72,7 @@ export default class YourProfile extends React.Component {
 		    console.log(err)
 		}
 
-
+*/
   	}
 
   	componentDidMount() {
