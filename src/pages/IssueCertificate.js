@@ -1,6 +1,8 @@
 import React from 'react';
 import '../App.css';
 
+import { AirtableOntCerts } from '../utils/airtable';
+
 import { client } from 'ontology-dapi';
 
 import { Account, Identity, Crypto, Claim, OntidContract, TransactionBuilder,
@@ -101,7 +103,9 @@ export default class IssueCertificate extends React.Component {
 		this.setState({identity: identity});
 	}
 
-	async issueOntIdClaim() {
+	async issueOntIdClaim(message) {
+
+		const timestamp = Date.now();
 
 		// Write claim
 		const signature = null;
@@ -111,14 +115,17 @@ export default class IssueCertificate extends React.Component {
 		    messageId: '1',
 		    issuer: issuerOntId,
 		    subject: subjectOntId,
-		    issueAt: 1525800823
+		    issueAt: timestamp
 		}, signature, useProof);
 		claim.version = '0.7.0';
 		claim.context = 'https://example.com/template/v1';
-		claim.content = {
+/*		claim.content = {
 		    Name: 'Bob Dylan',
 		    Age: '22',
 		};
+*/
+
+		claim.content = message;
 
 		// Sign claim
 		console.log('issueOntIdClaim signing claim');
@@ -131,12 +138,15 @@ export default class IssueCertificate extends React.Component {
 
 		const msg = Claim.deserialize(signed);
 
+		var fields = {'claim': JSON.stringify(claim)}
+		this.addClaimToAirtable(fields);
+
 		this.verifyClaim(msg);
 		this.verifyClaimHasAttest(msg);
 		this.verifyClaimAttested(msg);
 
 
-		this.attestClaim(claim);
+//		this.attestClaim(claim);
 
 	}
 
@@ -195,14 +205,14 @@ export default class IssueCertificate extends React.Component {
 //		const result = await this.signMessage(message);
 
 		// Issue claim by ONT ID claim attestation
-		var message = JSON.stringify(claim);
-		const result = await this.issueClaimOntId(message);
-
-    console.log('issueClaim result', result);
-		console.log('issueClaim data', result.data);
-		console.log('issueClaim publicKey', result.publicKey);
+//		var message = JSON.stringify(claim);
+		const result = await this.issueOntIdClaim(claim);
 
 		this.setState({'signature': result})
+
+//		var fields = {'Claim': JSON.stringify(claim)}
+
+//		this.addClaimToAirtable(fields);
 
 		var signed_certificate = {
 			'sender': sender,
@@ -213,6 +223,22 @@ export default class IssueCertificate extends React.Component {
 
 		this.setState({json: signed_certificate});
 		//		new CSVDownload(this.state.csvClaim);
+	}
+
+	async addClaimToAirtable(fields) {
+	  await AirtableOntCerts('Claims').create([
+	    {
+	      fields
+	    }
+	  ], function(err, records) {
+	    if (err) {
+	      console.error(err);
+	      return;
+	    }
+	    records.forEach(function (record) {
+	      console.log('addClaimToAirtable() record.getId() = ', record.getId());
+	    });
+	  });
 	}
 
 	handleChange(event) {
@@ -238,7 +264,7 @@ export default class IssueCertificate extends React.Component {
 		this.setState({'claim': claim});
 //		alert('A claim was submitted: ' + JSON.stringify(claim));
 
-		this.issueClaim(this.state.sender, this.state.recipient,claim);
+		this.issueClaim(this.state.sender, this.state.recipient, claim);
 	}
 
 	render() {

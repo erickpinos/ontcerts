@@ -3,171 +3,107 @@ import '../App.css';
 
 import { client } from 'ontology-dapi';
 
-import benLogo from '../images/ben-logo.png';
-
 import Certificate from '../components/Certificate.js';
 
 var profiles = require('../data/profiles.js');
 
 client.registerClient({});
 
-var certificates = [];
-
-for (let i = 0; i < 5; i++) {
-	try {
-		var certificate = require("../signed_certificates/certificate" + i + ".json");
-		certificates.push(certificate);
-	} catch(e) {
-		console.log(e);
-	}
-}
-
-console.log('certificates', certificates);
-
 export default class ViewCertificates extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
-      certificates: [],
-			sender: '',
-			recipient: '',
-			claim: '',
-			signature: '',
-			json: '',
-			certType: 'Certificate of Completion',
-			certIntro: 'This certificate is awarded to',
-			certRecipient: 'Erick Pinos',
-			certFor: 'for successfully completing the BEN lesson',
-			certTopic: 'Launch an ERC20 Token',
-			certDate: 'February 14, 2020',
-			certSignSig: 'Erick Pinos',
-			certSignName: 'Erick Pinos',
-			certSignTitle: 'President'
+			claims: [],
+			publicKey: '',
 		};
+	}
 
-		this.handleChange = this.handleChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
+	getLocalCertificates() {
 
+		var certificates = this.state.certificates;
+
+		for (let i = 0; i < 5; i++) {
+			try {
+				var certificate = require("../signed_certificates/certificate" + i + ".json");
+				certificates.push({'type': 'localCertificate', 'certificate': certificate});
+			} catch(e) {
+				console.log(e);
+			}
+		}
+
+		this.setState({
+			claims: certificates
+		});
+	}
+
+	isJsonString(str) {
+	    try {
+	        JSON.parse(str);
+	    } catch (e) {
+	        return false;
+	    }
+	    return true;
+	}
+
+	getAirtableClaims() {
+
+		const base = 'https://api.airtable.com/v0/app9EPqqBKTlihZgU/Claims?api_key=';
+    const apiKey = process.env.REACT_APP_AIRTABLE_API_KEY;
+
+    fetch(base + apiKey)
+    .then((resp) => resp.json())
+    .then(data => {
+			console.log('getAirtableClaims data', data);
+
+			var claims = [];
+
+			for (let i = 0; i < data.records.length; i++) {
+				var claimJson = data.records[i].fields['claim'];
+				console.log('getAirtableClaims claimJson', claimJson);
+				if(this.isJsonString(claimJson)) {
+					var claim = JSON.parse(claimJson);
+					console.log('getAirtableClaims claim', claim);
+					claims.push({'type': 'airtableCertificate', 'certificate': claim});
+				}
+			}
+
+			console.log('getAirtableClaims claims', claims);
+	    this.setState({ claims: claims });
+
+	   }).catch(err => {
+	   	console.log(err);
+	   });
 	}
 
 	async getPublicKey() {
 		const publicKey = await client.api.asset.getPublicKey();
 		console.log('the public key is', publicKey);
-		this.setState({sender: publicKey});
+		this.setState({publicKey: publicKey});
 	}
 
 	componentDidMount() {
 		this.getPublicKey();
-
-//    this.getCertificate('./signed_certificates/certificate3.json');
-	}
-
-/*
-  getCertificate(certificateURL) {
-		fetch(certificateURL)
-		.then((response) => response.text())
-		.then((data) =>{
-//			console.log(data);
-			var certificates = ['1'];
-			var certificate = certificates[2];
-			certificate.claim = JSON.parse(certificates[2].claim);
-			var certificates = this.state.certificates;
-			certificates.push(certificate);
-			this.setState({certificates: certificates});
-			console.log('this.state.certificates set to', this.state.certificates);
-			console.log(this.state.certificates[0]);
-			var certificatethis = this.state.certificates[0];
-			console.log('certificatethis', certificatethis);
-			console.log(certificatethis.recipient);
-		})
-	}
-*/
-	async issueClaim(sender, recipient, claim) {
-		console.log('issueClaim()');
-		console.log('sender', sender);
-		console.log('recipient', recipient);
-		console.log('claim', claim);
-
-		var message = claim;
-
-		try {
-			const result = await client.api.message.signMessage({ message });
-
-      console.log('signature:', result);
-
-			var issuer = profiles[result['publicKey']];
-
-			console.log('claim signed by ' + issuer);
-			console.log('signature:', result);
-			console.log('data', result.data);
-			console.log('publicKey', result.publicKey);
-
-			this.setState({'signature': result})
-
-			var signed_certificate = {
-				'sender': sender,
-				'recipient': recipient,
-				'claim': message,
-				'signature': result
-			};
-
-			this.setState({json: signed_certificate});
-//		new CSVDownload(this.state.csvClaim);
-	//			alert('onSignMessage finished, signature:' + result.data);
-		} catch (e) {
-			alert('onSignMessage canceled');
-			console.log('onSignMessage error:', e);
-		}
-	}
-
-	handleChange(event) {
-		this.setState({
-			[event.target.name]: event.target.value,
-		});
-		console.log(event.target.value);
-	}
-
-	handleSubmit(event) {
-		event.preventDefault();
-		var claim = {};
-		claim.certType = this.state.certType;
-		claim.certIntro = this.state.certIntro;
-		claim.certRecipient = this.state.certRecipient;
-		claim.certFor = this.state.certFor;
-		claim.certTopic = this.state.certTopic;
-		claim.certDate = this.state.certDate;
-		claim.certSignSig = this.state.certSignSig;
-		claim.certSignName = this.state.certSignName;
-		claim.certSignTitle = this.state.certSignTitle;
-		this.setState({'claim': claim});
-		alert('A claim was submitted: ' + JSON.stringify(claim));
-		this.issueClaim(this.state.sender, this.state.recipient, claim);
+//		this.getLocalCertificates();
+		this.getAirtableClaims();
 	}
 
 	render() {
 
-    if(!certificates[0]){return (<div>No certificates detected.</div>)}
+		console.log('render claims', this.state.claims, 'length', this.state.claims.length);
 
 		return(
 			<div>
 
-      <h3>Verify Certificates</h3>
+      <h3>View Certificates</h3>
 
-			<div className="row justify-content-center">
-				<div className="col-8">
-					<div className="card">
-						<div className="card-body">
-							<h5 className="card-title">Credential</h5>
-							<div className="card-text">BEN</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<div className='certificates'>
 
-			<div class='certificates'>
-
-				{certificates.map(certificate => <Certificate key={certificate.recipient} certificate={certificate} />)}
+				{this.state.claims && (
+					<React.Fragment>
+						{this.state.claims.map((currElement, index) => <Certificate key={index} certificate={currElement} />)}
+					</React.Fragment>
+				)}
 
 			</div>
 
