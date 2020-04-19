@@ -13,7 +13,7 @@ client.registerClient({});
 
 var certificates = [];
 
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 5; i++) {
 	try {
 		var certificate = require("../signed_certificates/certificate" + i + ".json");
 		certificates.push(certificate);
@@ -24,7 +24,7 @@ for (let i = 0; i < 4; i++) {
 
 console.log('certificates', certificates);
 
-export default class IssueCertificate extends React.Component {
+export default class ViewCertificates extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -149,10 +149,21 @@ export default class IssueCertificate extends React.Component {
 
     if(!certificates[0]){return (<div>No certificates detected.</div>)}
 
-		return (
+		return(
 			<div>
 
       <h3>Verify Certificates</h3>
+
+			<div className="row justify-content-center">
+				<div className="col-8">
+					<div className="card">
+						<div className="card-body">
+							<h5 className="card-title">Credential</h5>
+							<div className="card-text">BEN</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
 			<div class='certificates'>
 

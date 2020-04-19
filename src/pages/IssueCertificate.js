@@ -36,6 +36,7 @@ export default class IssueCertificate extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 
+		this.issueClaim = this.issueClaim.bind(this);
 		this.createAccount = this.createAccount.bind(this);
 		this.sendTransaction = this.sendTransaction.bind(this);
 
@@ -341,42 +342,42 @@ export default class IssueCertificate extends React.Component {
 //		const result = await claim.getStatus(url);
 	}
 
-	async issueClaim(sender, recipient, claim) {
-		console.log('issueClaim()');
-		console.log('sender', sender);
-		console.log('recipient', recipient);
-		console.log('claim', claim);
-
-		var message = JSON.stringify(claim);
-
+	async signMessage(message) {
 		try {
 			const result = await client.api.message.signMessage({ message });
-
-      console.log('signature:', result);
-
-			var issuer = profiles[result['publicKey']];
-
-			console.log('claim signed by ' + issuer);
-			console.log('signature:', result);
-			console.log('data', result.data);
-			console.log('publicKey', result.publicKey);
-
-			this.setState({'signature': result})
-
-			var signed_certificate = {
-				'sender': sender,
-				'recipient': recipient,
-				'claim': claim,
-				'signature': result
-			};
-
-			this.setState({json: signed_certificate});
-//		new CSVDownload(this.state.csvClaim);
-	//			alert('onSignMessage finished, signature:' + result.data);
+			console.log('onSignMessage finished');
+			console.log('onSignMessage signature', result.data);
+			return result;
 		} catch (e) {
-			alert('onSignMessage canceled');
-			console.log('onSignMessage error:', e);
+			console.log('onSignMessage error', e);
 		}
+	}
+
+	async issueClaim(sender, recipient, claim) {
+		console.log('issueClaim');
+		console.log('issueClaim sender', sender);
+		console.log('issueClaim recipient', recipient);
+		console.log('issueClaim claim', claim);
+
+		// Issue claim by message signing
+		var message = JSON.stringify(claim);
+		const result = await this.signMessage(message);
+
+    console.log('issueClaim result', result);
+		console.log('issueClaim data', result.data);
+		console.log('issueCLaim publicKey', result.publicKey);
+
+		this.setState({'signature': result})
+
+		var signed_certificate = {
+			'sender': sender,
+			'recipient': recipient,
+			'claim': claim,
+			'signature': result
+		};
+
+		this.setState({json: signed_certificate});
+		//		new CSVDownload(this.state.csvClaim);
 	}
 
 	handleChange(event) {
@@ -398,10 +399,12 @@ export default class IssueCertificate extends React.Component {
 		claim.certSignSig = this.state.certSignSig;
 		claim.certSignName = this.state.certSignName;
 		claim.certSignTitle = this.state.certSignTitle;
+
 		this.setState({'claim': claim});
 //		alert('A claim was submitted: ' + JSON.stringify(claim));
 //		this.issueClaim(this.state.sender, this.state.recipient, claim);
-	this.issueClaim();
+
+		this.issueClaim(this.state.sender, this.state.recipient,claim);
 	}
 
 	render() {
@@ -424,6 +427,11 @@ export default class IssueCertificate extends React.Component {
 
 			<div><button onClick={this.verifyClaim}>Verify Claim</button></div>
 
+			<div><button>Non ONT ID Academic Credential</button></div>
+
+			<div><button>ONT ID Academic Credential</button></div>
+
+			{/* Non ONT ID Academic Credential*/}
 			<form onSubmit={this.handleSubmit}>
 
 				<div className="form-group">
@@ -492,27 +500,20 @@ export default class IssueCertificate extends React.Component {
 				<div className="form-group">
 					<input type="submit" value="Submit" />
 				</div>
-
-				<div className="row justify-content-center">
-				<div className="col-6" style={{wordWrap: 'break-word'}}>
-					<code>
-						<div>
-							Sender: {this.state.sender}
-						</div>
-
-						<div>
-						Signature: {JSON.stringify(this.state.signature)}
-						</div>
-					</code>
-				</div>
-				</div>
-
-				<div className="row justify-content-center">
-					<div className="col-6" style={{wordWrap: 'break-word'}}>
-						{JSON.stringify(this.state.json)}
-					</div>
-				</div>
 		</form>
+
+		{ (this.state.json !== '') && (
+			<div className="row justify-content-center">
+				<div className="col-6" style={{wordWrap: 'break-word'}}>
+					<h3>Resulting JSON</h3>
+					<code>
+							{JSON.stringify(this.state.json)}
+					</code>
+					<p>Save this JSON somewhere safe. Your credential will be lost without it.</p>
+				</div>
+			</div>
+			)
+		}
 			</div>
 		);
 	}

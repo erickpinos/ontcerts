@@ -78,3 +78,8 @@ table, th, td {
   color: #fff;
   text-decoration: underline;
 }
+
+/* Custom CSS */
+textarea {
+  width: 50%;
+}

@@ -12,13 +12,12 @@ import erickImage from './images/erick-image.jpg';
 
 import YourProfile from './pages/YourProfile';
 import Issuers from './pages/Issuers';
-import VerifyCertificate from './pages/VerifyCertificate';
+import ViewCertificates from './pages/ViewCertificates';
 import IssueCertificate from './pages/IssueCertificate';
 
 var profiles = require('./data/profiles.js');
 
 client.registerClient({});
-
 
 var car = require("./signed_certificates/certificate1.json");
 var certificate2 = require("./signed_certificates/certificate2.json");
@@ -75,6 +74,8 @@ export default class App extends React.Component {
       <Router onUpdate={() => window.scrollTo(0, 0)} history={history}>
 				<header className="App-header">
 					<p className="App-link">ONTcerts</p>
+					<h5> Connected Wallet: testANTPrAEzLK7mnVNKUTTp7MQTnbD7evr8W6</h5>
+					<h5> Welcome, testErick</h5>
 				</header>
 
 				<div className="header-nav" style={{backgroundColor: '#000'}}>
@@ -82,7 +83,7 @@ export default class App extends React.Component {
 						<div className="item"><NavLink to="/your-profile">Your Profile</NavLink></div>
 					<div className="item"><NavLink to="/profiles">Profiles</NavLink></div>
 					<div className="item"><NavLink to="/issue-certificate">Issue Certificate</NavLink></div>
-					<div className="item"><NavLink to="/verify-certificate">Verify Certificate</NavLink></div>
+					<div className="item"><NavLink to="/view-certificates">View Certificates</NavLink></div>
 					</div>
 				</div>
 
@@ -93,7 +94,7 @@ export default class App extends React.Component {
 					<Route path="/your-profile" component={YourProfile}/>
 					<Route path="/profiles" component={Issuers}/>
 					<Route path="/issue-certificate" component={IssueCertificate}/>
-					<Route path="/verify-certificate" component={VerifyCertificate}/>
+					<Route path="/view-certificates" component={ViewCertificates}/>
 				</Switch>
 				</div>
 
