@@ -13,7 +13,7 @@ client.registerClient({});
 
 var certificates = [];
 
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 4; i++) {
 	try {
 		var certificate = require("../signed_certificates/certificate" + i + ".json");
 		certificates.push(certificate);
@@ -48,8 +48,6 @@ export default class IssueCertificate extends React.Component {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
-
-		this.onVerifyMessage = this.onVerifyMessage.bind(this);
 
 	}
 
@@ -146,29 +144,6 @@ export default class IssueCertificate extends React.Component {
 		alert('A claim was submitted: ' + JSON.stringify(claim));
 		this.issueClaim(this.state.sender, this.state.recipient, claim);
 	}
-
-	async onVerifyMessage(message, publicKey, data) {
-
-		const signature: Signature = {
-			data,
-			publicKey
-		};
-
-		try {
-			const result = await client.api.message.verifyMessage({ message, signature });
-			alert('onVerifyMessage finished, result:' + result);
-			if (result == true) {
-				this.setState({verified: 'verified'});
-				var profile = profiles[publicKey];
-				this.setState({verifiedFrom: profile});
-			}
-		} catch (e) {
-			alert('onVerifyMessage canceled');
-			// tslint:disable-next-line:no-console
-			console.log('onVerifyMessage error:', e);
-		}
-	}
-
 
 	render() {
 

@@ -12,8 +12,8 @@ export default class Certificate extends React.Component {
     super(props);
 
 		this.state = {
-      'verified': '',
-      'verifiedFrom': ''
+      'verified': 'unknown',
+      'verifiedFrom': 'unknown'
     };
 
     this.onVerifyMessage = this.onVerifyMessage.bind(this);
@@ -22,16 +22,25 @@ export default class Certificate extends React.Component {
 
   async onVerifyMessage(message, publicKey, data) {
 
+    console.log('onVerifyMessage started');
+    console.log('message', message);
+    console.log('data', data);
+    console.log('publicKey', publicKey);
+
 		const signature: Signature = {
 			data,
 			publicKey
 		};
 
+    console.log('signature', signature);
+
 		try {
 			const result = await client.api.message.verifyMessage({ message, signature });
 //			alert('onVerifyMessage finished, result:' + result);
+      console.log('onVerifyMessage finished');
+      console.log('result', result);
 			if (result == true) {
-				this.setState({verified: 'verified'});
+				this.setState({verified: 'no'});
 
         for (let i = 0; i < profiles.length; i++) {
 	  				if (profiles[i]['publicKey'] === publicKey) {
@@ -41,8 +50,16 @@ export default class Certificate extends React.Component {
 	  				}
 	  		}
 
-
-			}
+			} else if (result == false) {
+        this.setState({verified: 'yes'});
+        for (let i = 0; i < profiles.length; i++) {
+	  				if (profiles[i]['publicKey'] === publicKey) {
+              this.setState({
+                verifiedFrom: profiles[i]['name']
+              });
+	  				}
+	  		}
+      }
 		} catch (e) {
 			alert('onVerifyMessage canceled');
 			// tslint:disable-next-line:no-console
@@ -53,11 +70,6 @@ export default class Certificate extends React.Component {
   render() {
 
     const certificate = this.props.certificate;
-
-    console.log('props', certificate);
-    var test = certificate.claim;
-    console.log('props', test);
-    console.log('props', test["certIntro"]);
 
   return (
 
@@ -79,7 +91,8 @@ export default class Certificate extends React.Component {
   			<button onClick={() => this.onVerifyMessage(JSON.stringify(this.props.certificate['claim']),this.props.certificate['signature']['publicKey'],this.props.certificate['signature']['data'])}>Verify Certificate</button>
   			{(this.state.verified != '') && (
         <React.Fragment>
-          <p>This certificate is {this.state.verified} from {this.state.verifiedFrom}</p>
+          <p>Who claims to have issued this claim? {this.state.verifiedFrom}</p>
+          <p>Has this claim been tampered with? {this.state.verified}</p>
         </React.Fragment>
       )}
   			</div>

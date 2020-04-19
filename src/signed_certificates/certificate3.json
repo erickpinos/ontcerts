@@ -1,0 +1,19 @@
+{
+  "sender": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
+  "recipient": "",
+  "claim": {
+    "certType": "Certificate of Completion",
+    "certIntro": "This certificate is awarded to",
+    "certRecipient": "Erick Pinos",
+    "certFor": "for successfully completing the BEN lesson",
+    "certTopic": "Blockchain 101",
+    "certDate": "February 14, 2020",
+    "certSignSig": "Erick Pinos",
+    "certSignName": "Erick Pinos",
+    "certSignTitle": "President"
+  },
+  "signature": {
+    "data": "016842009ab84eb9edb7d24ce8771d1dbaad6f632a413ed6f1d986180d50ccba3b6997adcbd77bb68bd7f606e8052c329f29231fe959905408b0cdd379fbf40852",
+    "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583"
+  }
+}

@@ -9,6 +9,7 @@ module.exports =  [
   {
     "account": "AGMDnFK157NchzGupLpGRX92WMKwkv5644",
     "name": "MIT",
+    "publicKey": "022ed31258992f0e86b3c8a6350e058b6af87fd926e59d4cc464325fb758b7b952",
     "email": "admin@mit.org",
     "image": require('../images/mit-logo.png')
   },
