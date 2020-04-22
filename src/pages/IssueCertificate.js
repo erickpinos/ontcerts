@@ -5,8 +5,9 @@ import { AirtableOntCerts } from '../utils/airtable';
 
 import { client } from 'ontology-dapi';
 
-import { Account, Identity, Crypto, Claim, OntidContract, TransactionBuilder,
-	RestClient, CONST, Wallet, OntAssetTxBuilder, WebsocketClient, RevocationType } from 'ontology-ts-sdk';
+import { Account, Identity, Crypto, Claim, OntidContract, OntidContractTxBuilder, TransactionBuilder,
+	RestClient, CONST, Wallet, OntAssetTxBuilder, WebsocketClient, RevocationType,
+	attestClaimTxBuilder, Merkle } from 'ontology-ts-sdk';
 
 var profiles = require('../data/profiles.js');
 
@@ -105,17 +106,26 @@ export default class IssueCertificate extends React.Component {
 
 	async issueOntIdClaim(message) {
 
-		const timestamp = Date.now();
+//		const timestamp = Date.now();
+		const restUrl = 'http://polaris1.ont.io:20334';
+		const socketUrl = 'ws://polaris1.ont.io:20335';
+
+		const adminPrivateKey = new Crypto.PrivateKey('7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97');
+		const adminAddress = new Crypto.Address('AdLUBSSHUuFaak9j169hiamXUmPuCTnaRz');
+
+		const ontid = 'did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL';
+		const publicKeyId = ontid + '#keys-1';
+		const privateKey = new Crypto.PrivateKey('4a8d6d61060998cf83acef4d6e7976d538b16ddeaa59a96752a4a7c0f7ec4860');
 
 		// Write claim
-		const signature = null;
-		const useProof = false;
+		const signature = undefined;
+		const useProof = true;
 
 		const claim = new Claim({
-		    messageId: '1',
-		    issuer: issuerOntId,
-		    subject: subjectOntId,
-		    issueAt: timestamp
+		    messageId: '2020/04/22',
+		    issuer: ontid,
+		    subject: ontid,
+		    issueAt: 1525800823
 		}, signature, useProof);
 		claim.version = '0.7.0';
 		claim.context = 'https://example.com/template/v1';
@@ -124,65 +134,157 @@ export default class IssueCertificate extends React.Component {
 		    Age: '22',
 		};
 */
-
 		claim.content = message;
 
 		// Sign claim
-		console.log('issueOntIdClaim signing claim');
-		var result = await claim.sign(restUrl, publicKeyId, privateKey);
-		console.log('issueOntIdClaim result', result);
 
-		signed = claim.serialize();
+		console.log('issueOntIdClaim claim unsigned', claim);
+		await claim.sign(restUrl, publicKeyId, privateKey);
 
-		console.log('issueOntIdClaim claim.signature', claim.signature);
+//		signed = claim.serialize();
 
-		const msg = Claim.deserialize(signed);
+//		console.log('issueOntIdClaim claim.signature', claim.signature);
 
-		var fields = {'claim': JSON.stringify(claim)}
-		this.addClaimToAirtable(fields);
+//		const msg = Claim.deserialize(signed);
 
-		this.verifyClaim(msg);
-		this.verifyClaimHasAttest(msg);
-		this.verifyClaimAttested(msg);
-
+//		this.verifyClaim(msg);
+//		this.verifyClaimAttested(msg);
 
 //		this.attestClaim(claim);
 
+		console.log('issueOntIdClaim claim signed', claim);
+
+		// Attest claim
+		const gasFee = '500';
+		const gasLimit = '20000';
+
+		const attestResult = await claim.attest(socketUrl, gasFee, gasLimit, adminAddress, adminPrivateKey);
+		console.log('issueOntIdClaim attestResult', attestResult);
+//		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
+
+		console.log('issueOntIdClaim claim attested', claim);
+
+		const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
+		const proof = await Merkle.constructMerkleProof(restUrl, attestResult.Result.TxHash, contract);
+
+		claim.proof = proof;
+		console.log('issueOntIdClaim claim wtih proof clamtomatch', claim);
+
+		const signed = claim.serialize();
+		console.log('issueOntIdClaim claim serialized', signed);
+
+		const msg = Claim.deserialize(signed);
+
+		console.log('issueOntIdClaim msg deserialized claimtomatch', msg);
+
+		const verifyResult = await msg.verify(restUrl, true);
+
+//		const verifyResult = await msg.getStatus(restUrl);
+		console.log('issueOntIdClaim verifyResult', verifyResult);
+
+		var fields = {'claim': JSON.stringify(signed)}
+		this.addClaimToAirtable(fields);
+
+/*
+		const pk = privateKey.getPublicKey();
+		const strs = signed.split('.');
+
+		const signData = this.str2hexstr(strs[0] + '.' + strs[1]);
+		const result2 = pk.verify(signData, msg.signature);
+
+console.log('issueOntIdClaim result2', result2);
+*/
 	}
+
+	/**
+	 * Turn normal string into hex string
+	 * @param str Normal string
+	 */
+	str2hexstr(str: string) {
+	    return this.ab2hexstring(this.str2ab(str));
+	}
+
+	/**
+	 * Turn normal string into ArrayBuffer
+	 * @param str Normal string
+	 */
+	str2ab(str: string) {
+	    const buf = new ArrayBuffer(str.length); // 每个字符占用1个字节
+	    const bufView = new Uint8Array(buf);
+	    for (let i = 0, strLen = str.length; i < strLen; i++) {
+	        bufView[i] = str.charCodeAt(i);
+	    }
+	    return buf;
+	}
+
+	/**
+ * Turn array buffer into hex string
+ * @param arr Array like value
+ */
+ab2hexstring(arr: any): string {
+    let result: string = '';
+    const uint8Arr: Uint8Array = new Uint8Array(arr);
+    for (let i = 0; i < uint8Arr.byteLength; i++) {
+        let str = uint8Arr[i].toString(16);
+        str = str.length === 0
+            ? '00'
+            : str.length === 1
+                ? '0' + str
+                : str;
+        result += str;
+    }
+    return result;
+}
+
 
 	async verifyClaim(msg) {
 		const result = await msg.verify(restUrl, false);
 		console.log('verifyClaim result', result);
 	}
 
-	async verifyClaimHasAttest(msg) {
-		const result = await msg.verify(restUrl, true);
-		console.log('verifyClaimMissingAttest result', result);
-	}
-
 	async verifyClaimAttested(msg) {
-		const result = await msg.verify(restUrl, false);
+		console.log('verifyClaimAttested msg', msg);
+//		const result = await msg.verify(restUrl, true);
+		const result = await msg.getStatus(restUrl);
 		console.log('verifyClaimAttested result', result);
-	}
+}
 
 	async attestClaim(claim) {
-		console.log('attestClaim');
+/*		console.log('attestClaim');
+
+		console.log('claimbeforeattesting', claim);
 
 		const gasFee = '500';
 		const gasLimit = '20000';
 
 		const result = await claim.attest(socketUrl, gasFee, gasLimit, adminAddress, adminPrivateKey);
-		console.log('attestClaim', result);
+		console.log('attestClaim result', result);
+//		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
 
+		const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
+		const proof = await Merkle.constructMerkleProof(restUrl, result.Result.TxHash, contract);
+		console.log('claim before modifying proof', claim);
+		claim.proof = proof;
+		console.log('proof', proof);
+
+		console.log('111 claim', claim);
 		const signed = claim.serialize();
-
+		console.log('111 signed', signed);
 		const msg = Claim.deserialize(signed);
-		this.verifyClaim(msg);
-		this.verifyClaimHasAttest(msg);
-		this.verifyClaimAttested(msg);
+		console.log('111 msg', msg);
 
+		console.log('verifyClaimAttested msg', msg);
+//		const result = await msg.verify(restUrl, true);
+//		const result = await msg.getStatus(restUrl);
+//		console.log('verifyClaimAttested result', result);
+
+//		this.verifyClaim(msg);
+//		this.verifyClaimAttested(msg);
+
+//		console.log('signed', signed);
+//		console.log('result', result);
+//		console.log('claim', claim);*/
 	}
-
 	async signMessage(message) {
 		try {
 			const result = await client.api.message.signMessage({ message });
@@ -210,9 +312,6 @@ export default class IssueCertificate extends React.Component {
 
 		this.setState({'signature': result})
 
-//		var fields = {'Claim': JSON.stringify(claim)}
-
-//		this.addClaimToAirtable(fields);
 
 		var signed_certificate = {
 			'sender': sender,
@@ -274,6 +373,8 @@ export default class IssueCertificate extends React.Component {
 			<div>
 			<h3>Issue Certificates</h3>
 			<p>You are {this.state.name}</p>
+
+			<div><button onClick={this.addAttribute}>Add Attribute</button></div>
 
 			<div><button onClick={this.issueOntIdClaim}>Issue ONT ID Claim</button></div>
 

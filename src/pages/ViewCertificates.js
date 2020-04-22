@@ -19,6 +19,7 @@ export default class ViewCertificates extends React.Component {
 		};
 	}
 
+
 	getLocalCertificates() {
 
 		var certificates = this.state.certificates;
