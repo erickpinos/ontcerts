@@ -55,15 +55,9 @@ export default class IssueCertificate extends React.Component {
 			signature: '',
 			json: '',
 			name: '',
-			certType: 'Certificate of Completion',
-			certIntro: 'This certificate is awarded to',
+			certName: 'Launch an ERC20 Token',
 			certRecipient: 'Erick Pinos',
-			certFor: 'for successfully completing the BEN lesson',
-			certTopic: 'Launch an ERC20 Token',
-			certDate: 'February 14, 2020',
-			certSignSig: 'Erick Pinos',
-			certSignName: 'Erick Pinos',
-			certSignTitle: 'President'
+			certDescription: 'for successfully completing the BEN lesson'
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -106,7 +100,7 @@ export default class IssueCertificate extends React.Component {
 
 	async issueOntIdClaim(message) {
 
-//		const timestamp = Date.now();
+		const timestamp = Date.now();
 		const restUrl = 'http://polaris1.ont.io:20334';
 		const socketUrl = 'ws://polaris1.ont.io:20335';
 
@@ -125,7 +119,7 @@ export default class IssueCertificate extends React.Component {
 		    messageId: '2020/04/22',
 		    issuer: ontid,
 		    subject: ontid,
-		    issueAt: 1525800823
+		    issuedAt: timestamp
 		}, signature, useProof);
 		claim.version = '0.7.0';
 		claim.context = 'https://example.com/template/v1';
@@ -350,15 +344,9 @@ ab2hexstring(arr: any): string {
 	handleSubmit(event) {
 		event.preventDefault();
 		var claim = {};
-		claim.certType = this.state.certType;
-		claim.certIntro = this.state.certIntro;
-		claim.certRecipient = this.state.certRecipient;
-		claim.certFor = this.state.certFor;
-		claim.certTopic = this.state.certTopic;
-		claim.certDate = this.state.certDate;
-		claim.certSignSig = this.state.certSignSig;
-		claim.certSignName = this.state.certSignName;
-		claim.certSignTitle = this.state.certSignTitle;
+		claim['Credential Name'] = this.state.certName;
+		claim['Recipient'] = this.state.certRecipient;
+		claim['Description'] = this.state.certDescription;
 
 		this.setState({'claim': claim});
 //		alert('A claim was submitted: ' + JSON.stringify(claim));
@@ -381,16 +369,9 @@ ab2hexstring(arr: any): string {
 			<form onSubmit={this.handleSubmit}>
 
 				<div className="form-group">
-					<label>Type:</label>
+					<label>Crediential Name:</label>
 					<div>
-						<textarea name="certType" value={this.state.certType} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Intro:</label>
-					<div>
-						<textarea name="certIntro" value={this.state.certIntro} onChange={this.handleChange} required/>
+						<textarea name="certName" value={this.state.certName} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
@@ -402,44 +383,9 @@ ab2hexstring(arr: any): string {
 				</div>
 
 				<div className="form-group">
-					<label>For:</label>
+					<label>Description:</label>
 					<div>
-						<textarea name="certFor" value={this.state.certFor} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Topic:</label>
-					<div>
-						<textarea name="certTopic" value={this.state.certTopic} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Date:</label>
-					<div>
-						<textarea name="certDate" value={this.state.certDate} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Signature:</label>
-					<div>
-						<textarea name="certSignSig" value={this.state.certSignSig} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Sign Name:</label>
-					<div>
-						<textarea name="certSignName" value={this.state.certSignName} onChange={this.handleChange} required/>
-					</div>
-				</div>
-
-				<div className="form-group">
-					<label>Sign Title:</label>
-					<div>
-						<textarea name="certSignTitle" value={this.state.certSignTitle} onChange={this.handleChange} required/>
+						<textarea name="certFor" value={this.state.certDescription} onChange={this.handleChange} required/>
 					</div>
 				</div>
 

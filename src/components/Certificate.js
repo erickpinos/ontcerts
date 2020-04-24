@@ -15,15 +15,24 @@ export default class Certificate extends React.Component {
     super(props);
 
 		this.state = {
+			'claimDeserialized': '',
 			'claimSerialized': this.props.certificate.certificate,
-			'claimDeserialized': Claim.deserialize(this.props.certificate.certificate),
+			'certificateType': this.props.certificate.type,
 			'testBlockchain': '',
 			'testSignature': ''
     };
-
 		this.verifyClaim = this.verifyClaim.bind(this);
 
   }
+	componentDidMount() {
+		try {
+			this.setState({
+				'claimDeserialized': Claim.deserialize(this.state.claimSerialized)
+			});
+		} catch(e) {
+			console.log(e);
+		}
+	}
 
 	async verifyClaim() {
 
@@ -57,25 +66,24 @@ export default class Certificate extends React.Component {
 		} else {
 			this.setState({testSignature: 'failed'});
 		}
-
 	}
 
   render() {
 
-		const claim = this.state.claimDeserialized;
+		try {
+			const claim = this.state.claimDeserialized;
+	    const certificateType = this.state.certificateType;
 
-    const certificate = this.props.certificate;
-		const deserializedMsg = Claim.deserialize(certificate.certificate);
 
-		try{
-			var certContents = Object.keys(claim.content).map(function(key) {
-				return (<div id={key}><span className="font-weight-bold">{key}</span> {JSON.stringify(claim.content[key])}</div>)
-			});
-		} catch(e) {
-			console.log(e);
-		}
+			try {
+				var certContents = Object.keys(claim.content).map(function(key) {
+					return (<div id={key}><span className="font-weight-bold">{key}</span> {JSON.stringify(claim.content[key])}</div>)
+				});
+			} catch(e) {
+				console.log(e);
+			}
 
-		var dateTime = new Date(claim.metadata.issueAt);
+			var issuedAt = new Date(claim.metadata.issuedAt);
 
 			return (
 		    <div className="row justify-content-center">
@@ -83,10 +91,10 @@ export default class Certificate extends React.Component {
 		  			<div className="card">
 		  			<div className="card-body text-left">
 
-						<div key={certificate.type}><span className="font-weight-bold">Type</span> {certificate.type} </div>
+						<div key={certificateType}><span className="font-weight-bold">Type</span> {certificateType} </div>
 
 						<div key={claim.metadata.issuer}><span className="font-weight-bold">Issuer</span> {claim.metadata.issuer} </div>
-						<div key={dateTime}><span className="font-weight-bold">Issued On</span> {dateTime.toUTCString()} </div>
+						<div key={issuedAt}><span className="font-weight-bold">Issued On</span> {issuedAt.toUTCString()} </div>
 
 						{certContents}
 
@@ -102,5 +110,8 @@ export default class Certificate extends React.Component {
 		  		</div>
 		  	</div>
 		  );
+		} catch(e) {
+			return (<div>Invalid Certificate</div>)
 		}
 	}
+}
