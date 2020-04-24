@@ -6,9 +6,7 @@ import { Claim } from 'ontology-ts-sdk';
 
 import Certificate from '../components/Certificate.js';
 
-import { getAccount } from '../utils/ontology';
-
-var profiles = require('../data/profiles.js');
+import { getAccount, getIdentity } from '../utils/ontology';
 
 client.registerClient({});
 
@@ -19,7 +17,8 @@ export default class ViewCertificates extends React.Component {
 		this.state = {
 			claims: [],
 			publicKey: '',
-			account: ''
+			account: '',
+			identity: ''
 		};
 	}
 
@@ -76,8 +75,8 @@ export default class ViewCertificates extends React.Component {
 
 				console.log('getAirtableClaims claims.metadata.issuer', claim.metadata.issuer);
 
-				if (claim.content['Recipient ONT ID'] === this.state.account || claim.metadata.issuer === 'did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL') {
-					claims.push({'type': 'airtableCertificate', 'certificate': claimSerialized});
+				if (claim.content['Recipient ONT ID'] === this.state.account || claim.metadata.issuer === this.state.identity) {
+					claims.push({'type': 'Online', 'certificate': claimSerialized});
 				}
 			}
 
@@ -100,7 +99,8 @@ export default class ViewCertificates extends React.Component {
 //		this.getLocalCertificates();
 		this.getAirtableClaims();
 		this.setState ({
-			account: await getAccount()
+			account: await getAccount(),
+			identity: await getIdentity()
 		});
 	}
 

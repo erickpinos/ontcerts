@@ -5,39 +5,11 @@ import { AirtableOntCerts } from '../utils/airtable';
 
 import { client } from 'ontology-dapi';
 
-import { Account, Identity, Crypto, Claim, Merkle } from 'ontology-ts-sdk';
-
-import { testBlockchain, testSignature } from '../utils/ontology';
+import { issueClaim } from '../utils/ontology';
 
 var profiles = require('../data/profiles.js');
 
 client.registerClient({});
-
-const restUrl = 'http://polaris1.ont.io:20334';
-const socketUrl = 'ws://polaris1.ont.io:20335';
-
-const adminPrivateKey = new Crypto.PrivateKey('7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97');
-const adminAddress = new Crypto.Address('AdLUBSSHUuFaak9j169hiamXUmPuCTnaRz');
-
-//const privateKey = Crypto.PrivateKey.random();
-const privateKey = adminPrivateKey;
-const publicKey = privateKey.getPublicKey();
-
-const account = Account.create(privateKey, '123456', 'MyAccount');
-const identity = Identity.create(privateKey, '123456', 'MyIdentity');
-
-const issuerOntId = identity.ontid;
-console.log('issuerOntId', issuerOntId);
-
-const subjectOntId = identity.ontid;
-console.log('subjectOntId', subjectOntId);
-
-const address = account.address;
-const publicKeyId = issuerOntId + '#keys-1';
-console.log('publicKeyId', publicKeyId);
-
-let serialized: string;
-let signed: string;
 
 export default class IssueCertificate extends React.Component {
 
@@ -48,10 +20,10 @@ export default class IssueCertificate extends React.Component {
 			identity: '',
 			sender: '',
 			subject: '',
-			claim: '',
 			signature: '',
 			json: '',
 			name: '',
+			serializedJSON: '',
 			certInstitutionName: 'BEN',
 			certSubject: 'Erick Pinos',
 			certCourseName: 'ERC20 Token',
@@ -62,8 +34,6 @@ export default class IssueCertificate extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 
 		this.issueClaim = this.issueClaim.bind(this);
-
-		this.issueOntIdClaim = this.issueOntIdClaim.bind(this);
 
 	}
 
@@ -96,123 +66,20 @@ export default class IssueCertificate extends React.Component {
 		this.setState({identity: identity});
 	}
 
-	async issueOntIdClaim(message, subject) {
+	async issueClaim(claim) {
 
-		const timestamp = Date.now();
-		const restUrl = 'http://polaris1.ont.io:20334';
-		const socketUrl = 'ws://polaris1.ont.io:20335';
+		const result = await issueClaim(claim);
+		console.log('issueClaim result', result);
 
-		const adminPrivateKey = new Crypto.PrivateKey('7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97');
-		const adminAddress = new Crypto.Address('AdLUBSSHUuFaak9j169hiamXUmPuCTnaRz');
+		this.addClaimToAirtable(result);
 
-		const ontid = 'did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL';
-		const publicKeyId = ontid + '#keys-1';
-		const privateKey = new Crypto.PrivateKey('4a8d6d61060998cf83acef4d6e7976d538b16ddeaa59a96752a4a7c0f7ec4860');
-
-		// Write claim
-		const signature = undefined;
-		const useProof = true;
-
-		const claim = new Claim({
-		    messageId: '2020/04/22',
-		    issuer: ontid,
-		    subject: ontid,
-		    issuedAt: timestamp
-		}, signature, useProof);
-		claim.version = '0.7.0';
-		claim.context = 'https://example.com/template/v1';
-/*		claim.content = {
-		    Name: 'Bob Dylan',
-		    Age: '22',
-		};
-*/
-		claim.content = message;
-
-		// Sign claim
-
-		console.log('issueOntIdClaim claim unsigned', claim);
-		await claim.sign(restUrl, publicKeyId, privateKey);
-
-		console.log('issueOntIdClaim claim signed', claim);
-
-		// Attest claim
-		const gasFee = '500';
-		const gasLimit = '20000';
-
-		const attestResult = await claim.attest(socketUrl, gasFee, gasLimit, adminAddress, adminPrivateKey);
-		console.log('issueOntIdClaim attestResult', attestResult);
-//		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
-
-		console.log('issueOntIdClaim claim attested', claim);
-
-		const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
-		const proof = await Merkle.constructMerkleProof(restUrl, attestResult.Result.TxHash, contract);
-
-		claim.proof = proof;
-		console.log('issueOntIdClaim claim wtih proof clamtomatch', claim);
-
-		const signed = claim.serialize();
-		console.log('issueOntIdClaim claim serialized', signed);
-
-		const msg = Claim.deserialize(signed);
-
-		console.log('issueOntIdClaim msg deserialized claimtomatch', msg);
-
-		const testBlockchainResult = await testBlockchain(signed);
-		console.log('issueOntIdClaim testBlockchainResult', testBlockchainResult);
-
-		const testSignatureResult = await testSignature(signed);
-		console.log('issueOntIdClaim testSignatureResult', testSignatureResult);
-
-		var fields = {'claim': signed}
-		this.addClaimToAirtable(fields);
-
+		this.setState({serializedJSON: result});
 	}
 
-	async verifyClaim(msg) {
-		const result = await msg.verify(restUrl, false);
-		console.log('verifyClaim result', result);
-	}
-
-	async verifyClaimAttested(msg) {
-		console.log('verifyClaimAttested msg', msg);
-//		const result = await msg.verify(restUrl, true);
-		const result = await msg.getStatus(restUrl);
-		console.log('verifyClaimAttested result', result);
-}
-
-	async issueClaim(sender, subject, claim) {
-		console.log('issueClaim');
-		console.log('issueClaim sender', sender);
-		console.log('issueClaim subject', subject);
-		console.log('issueClaim claim', claim);
-
-		// Issue claim by ONT message signing
-//		var message = JSON.stringify(claim);
-//		const result = await this.signMessage(message);
-
-		// Issue claim by ONT ID claim attestation
-//		var message = JSON.stringify(claim);
-		const result = await this.issueOntIdClaim(claim, subject);
-
-		this.setState({'signature': result})
-
-
-		var signed_certificate = {
-			'sender': sender,
-			'subject': subject,
-			'claim': claim,
-			'signature': result
-		};
-
-		this.setState({json: signed_certificate});
-		//		new CSVDownload(this.state.csvClaim);
-	}
-
-	async addClaimToAirtable(fields) {
+	async addClaimToAirtable(claimSerialized) {
 	  await AirtableOntCerts('Claims').create([
 	    {
-	      fields
+				fields: {'claim': claimSerialized}
 	    }
 	  ], function(err, records) {
 	    if (err) {
@@ -220,7 +87,7 @@ export default class IssueCertificate extends React.Component {
 	      return;
 	    }
 	    records.forEach(function (record) {
-	      console.log('addClaimToAirtable() record.getId() = ', record.getId());
+	      console.log('addClaimToAirtable record.getId() = ', record.getId());
 	    });
 	  });
 	}
@@ -234,16 +101,13 @@ export default class IssueCertificate extends React.Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-		var claim = {};
-		claim['Institution Name'] = this.state.certInstitutionName;
-		claim['Recipient ONT ID'] = this.state.certSubject;
-		claim['Course Name'] = this.state.certCourseName;
-		claim['Final Grade'] = this.state.certFinalGrade;
+		var claimContent = {};
+		claimContent['Institution Name'] = this.state.certInstitutionName;
+		claimContent['Recipient ONT ID'] = this.state.certSubject;
+		claimContent['Course Name'] = this.state.certCourseName;
+		claimContent['Final Grade'] = this.state.certFinalGrade;
 
-		this.setState({'claim': claim});
-//		alert('A claim was submitted: ' + JSON.stringify(claim));
-
-		this.issueClaim(this.state.sender, this.state.subject, claim);
+		this.issueClaim(claimContent);
 	}
 
 	render() {
@@ -291,14 +155,14 @@ export default class IssueCertificate extends React.Component {
 				</div>
 		</form>
 
-		{ (this.state.json !== '') && (
+		{ (this.state.serializedJSON !== '') && (
 			<div className="row justify-content-center">
-				<div className="col-6" style={{wordWrap: 'break-word'}}>
-					<h3>Resulting JSON</h3>
+				<div className="col-12" style={{wordWrap: 'break-word'}}>
+					<h3>Resulting Serialized JSON</h3>
 					<code>
-							{JSON.stringify(this.state.json)}
+							{this.state.serializedJSON}
 					</code>
-					<p>Save this JSON somewhere safe. Your credential will be lost without it.</p>
+					<p>Save this serialized JSON somewhere safe. Your credential will be lost without it.</p>
 				</div>
 			</div>
 			)

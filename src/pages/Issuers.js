@@ -39,7 +39,7 @@ export default function Issuers() {
 									<td>{profile.email}</td>
 									<td>{profile.account}</td>
 									<td>{profile.publicKey}</td>
-									<td><img src={profile.image} width="100px"/></td>
+									<td><img src={profile.image} alt="profile" width="100px"/></td>
 						    </tr>
               ))}
             </tbody>

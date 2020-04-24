@@ -103,7 +103,7 @@ export default class YourProfile extends React.Component {
             <div><b>Email</b>: {this.state.email}</div>
             <div><b>Account</b>: {this.state.account}</div>
             <div><b>Public Key</b>: {this.state.publicKey}</div>
-            <div><b>Image</b>: <img width="150px" src={this.state.image}/></div>
+            <div><b>Image</b>: <img width="150px" src={this.state.image} alt="profile"/></div>
           </div>
         </div>
 

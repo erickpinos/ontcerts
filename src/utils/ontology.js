@@ -1,8 +1,9 @@
 import { client } from 'ontology-dapi';
-import { Claim, Crypto } from 'ontology-ts-sdk';
+import { Claim, Crypto, Merkle } from 'ontology-ts-sdk';
 import { str2hexstr } from '../utils/utils';
 
 const restUrl = 'http://polaris1.ont.io:20334';
+const socketUrl = 'ws://polaris1.ont.io:20335';
 
 client.registerClient({});
 
@@ -14,6 +15,79 @@ export async function getAccount() {
   } catch(e) {
     console.log(e);
   }
+}
+
+export async function getIdentity() {
+  try {
+    const result = await client.api.identity.getIdentity();
+    console.log('getIdentity', result);
+    return result;
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+export async function issueClaim(claimContent) {
+  const timestamp = Date.now();
+
+  const adminPrivateKey = new Crypto.PrivateKey('7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97');
+  const adminAddress = new Crypto.Address('AdLUBSSHUuFaak9j169hiamXUmPuCTnaRz');
+
+  const ontid = 'did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL';
+  const publicKeyId = ontid + '#keys-1';
+  const privateKey = new Crypto.PrivateKey('4a8d6d61060998cf83acef4d6e7976d538b16ddeaa59a96752a4a7c0f7ec4860');
+
+  // Write claim
+  const signature = undefined;
+  const useProof = true;
+
+  const claim = new Claim({
+      messageId: '2020/04/22',
+      issuer: ontid,
+      subject: ontid,
+      issuedAt: timestamp
+  }, signature, useProof);
+  claim.version = '0.7.0';
+  claim.context = 'https://example.com/template/v1';
+  claim.content = claimContent;
+
+  // Sign claim
+
+  console.log('issueClaim claim unsigned', claim);
+  await claim.sign(restUrl, publicKeyId, privateKey);
+
+  console.log('issueClaim claim signed', claim);
+
+  // Attest claim
+  const gasFee = '500';
+  const gasLimit = '20000';
+
+  const attestResult = await claim.attest(socketUrl, gasFee, gasLimit, adminAddress, adminPrivateKey);
+  console.log('issueClaim attestResult', attestResult);
+//		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
+
+  console.log('issueClaim claim attested', claim);
+
+  const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
+  const proof = await Merkle.constructMerkleProof(restUrl, attestResult.Result.TxHash, contract);
+
+  claim.proof = proof;
+  console.log('issueClaim claim wtih proof clamtomatch', claim);
+
+  const signed = claim.serialize();
+  console.log('issueClaim claim serialized', signed);
+
+  const msg = Claim.deserialize(signed);
+
+  console.log('issueClaim msg deserialized claimtomatch', msg);
+
+  const testBlockchainResult = await testBlockchain(signed);
+  console.log('issueClaim testBlockchainResult', testBlockchainResult);
+
+  const testSignatureResult = await testSignature(signed);
+  console.log('issueClaim testSignatureResult', testSignatureResult);
+
+  return signed;
 }
 
 export async function testBlockchain(claimSerialized) {

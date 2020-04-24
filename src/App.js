@@ -7,10 +7,6 @@ import { Router, Route, Switch, NavLink } from 'react-router-dom';
 
 import history from './utils/history';
 
-import benLogo from './images/ben-logo.png';
-import mitLogo from './images/mit-logo.png';
-import erickImage from './images/erick-image.jpg';
-
 import YourProfile from './pages/YourProfile';
 import Issuers from './pages/Issuers';
 import ViewCertificates from './pages/ViewCertificates';
@@ -18,13 +14,7 @@ import IssueCertificate from './pages/IssueCertificate';
 
 import { getAccount } from './utils/ontology';
 
-var profiles = require('./data/profiles.js');
-
 client.registerClient({});
-
-var car = require("./signed_certificates/certificate1.json");
-var certificate2 = require("./signed_certificates/certificate2.json");
-
 
 export default class App extends React.Component {
 	constructor(props) {
