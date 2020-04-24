@@ -5,9 +5,9 @@ import { AirtableOntCerts } from '../utils/airtable';
 
 import { client } from 'ontology-dapi';
 
-import { Account, Identity, Crypto, Claim, OntidContract, OntidContractTxBuilder, TransactionBuilder,
-	RestClient, CONST, Wallet, OntAssetTxBuilder, WebsocketClient, RevocationType,
-	attestClaimTxBuilder, Merkle } from 'ontology-ts-sdk';
+import { Account, Identity, Crypto, Claim, Merkle } from 'ontology-ts-sdk';
+
+import { testBlockchain, testSignature } from '../utils/ontology';
 
 var profiles = require('../data/profiles.js');
 
@@ -25,9 +25,6 @@ const publicKey = privateKey.getPublicKey();
 
 const account = Account.create(privateKey, '123456', 'MyAccount');
 const identity = Identity.create(privateKey, '123456', 'MyIdentity');
-
-//const ontid = 'did:ont:AN88DMMBZr5X9ChpMHX3LqRvQHqGxk2c3r';
-//const ontid = identity.ontid;
 
 const issuerOntId = identity.ontid;
 console.log('issuerOntId', issuerOntId);
@@ -50,14 +47,15 @@ export default class IssueCertificate extends React.Component {
 			account: '',
 			identity: '',
 			sender: '',
-			recipient: '',
+			subject: '',
 			claim: '',
 			signature: '',
 			json: '',
 			name: '',
-			certName: 'Launch an ERC20 Token',
-			certRecipient: 'Erick Pinos',
-			certDescription: 'for successfully completing the BEN lesson'
+			certInstitutionName: 'BEN',
+			certSubject: 'Erick Pinos',
+			certCourseName: 'ERC20 Token',
+			certFinalGrade: 'Pass'
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -98,7 +96,7 @@ export default class IssueCertificate extends React.Component {
 		this.setState({identity: identity});
 	}
 
-	async issueOntIdClaim(message) {
+	async issueOntIdClaim(message, subject) {
 
 		const timestamp = Date.now();
 		const restUrl = 'http://polaris1.ont.io:20334';
@@ -135,17 +133,6 @@ export default class IssueCertificate extends React.Component {
 		console.log('issueOntIdClaim claim unsigned', claim);
 		await claim.sign(restUrl, publicKeyId, privateKey);
 
-//		signed = claim.serialize();
-
-//		console.log('issueOntIdClaim claim.signature', claim.signature);
-
-//		const msg = Claim.deserialize(signed);
-
-//		this.verifyClaim(msg);
-//		this.verifyClaimAttested(msg);
-
-//		this.attestClaim(claim);
-
 		console.log('issueOntIdClaim claim signed', claim);
 
 		// Attest claim
@@ -171,65 +158,16 @@ export default class IssueCertificate extends React.Component {
 
 		console.log('issueOntIdClaim msg deserialized claimtomatch', msg);
 
-		const verifyResult = await msg.verify(restUrl, true);
+		const testBlockchainResult = await testBlockchain(signed);
+		console.log('issueOntIdClaim testBlockchainResult', testBlockchainResult);
 
-//		const verifyResult = await msg.getStatus(restUrl);
-		console.log('issueOntIdClaim verifyResult', verifyResult);
+		const testSignatureResult = await testSignature(signed);
+		console.log('issueOntIdClaim testSignatureResult', testSignatureResult);
 
-		var fields = {'claim': JSON.stringify(signed)}
+		var fields = {'claim': signed}
 		this.addClaimToAirtable(fields);
 
-/*
-		const pk = privateKey.getPublicKey();
-		const strs = signed.split('.');
-
-		const signData = this.str2hexstr(strs[0] + '.' + strs[1]);
-		const result2 = pk.verify(signData, msg.signature);
-
-console.log('issueOntIdClaim result2', result2);
-*/
 	}
-
-	/**
-	 * Turn normal string into hex string
-	 * @param str Normal string
-	 */
-	str2hexstr(str: string) {
-	    return this.ab2hexstring(this.str2ab(str));
-	}
-
-	/**
-	 * Turn normal string into ArrayBuffer
-	 * @param str Normal string
-	 */
-	str2ab(str: string) {
-	    const buf = new ArrayBuffer(str.length); // 每个字符占用1个字节
-	    const bufView = new Uint8Array(buf);
-	    for (let i = 0, strLen = str.length; i < strLen; i++) {
-	        bufView[i] = str.charCodeAt(i);
-	    }
-	    return buf;
-	}
-
-	/**
- * Turn array buffer into hex string
- * @param arr Array like value
- */
-ab2hexstring(arr: any): string {
-    let result: string = '';
-    const uint8Arr: Uint8Array = new Uint8Array(arr);
-    for (let i = 0; i < uint8Arr.byteLength; i++) {
-        let str = uint8Arr[i].toString(16);
-        str = str.length === 0
-            ? '00'
-            : str.length === 1
-                ? '0' + str
-                : str;
-        result += str;
-    }
-    return result;
-}
-
 
 	async verifyClaim(msg) {
 		const result = await msg.verify(restUrl, false);
@@ -243,57 +181,10 @@ ab2hexstring(arr: any): string {
 		console.log('verifyClaimAttested result', result);
 }
 
-	async attestClaim(claim) {
-/*		console.log('attestClaim');
-
-		console.log('claimbeforeattesting', claim);
-
-		const gasFee = '500';
-		const gasLimit = '20000';
-
-		const result = await claim.attest(socketUrl, gasFee, gasLimit, adminAddress, adminPrivateKey);
-		console.log('attestClaim result', result);
-//		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
-
-		const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
-		const proof = await Merkle.constructMerkleProof(restUrl, result.Result.TxHash, contract);
-		console.log('claim before modifying proof', claim);
-		claim.proof = proof;
-		console.log('proof', proof);
-
-		console.log('111 claim', claim);
-		const signed = claim.serialize();
-		console.log('111 signed', signed);
-		const msg = Claim.deserialize(signed);
-		console.log('111 msg', msg);
-
-		console.log('verifyClaimAttested msg', msg);
-//		const result = await msg.verify(restUrl, true);
-//		const result = await msg.getStatus(restUrl);
-//		console.log('verifyClaimAttested result', result);
-
-//		this.verifyClaim(msg);
-//		this.verifyClaimAttested(msg);
-
-//		console.log('signed', signed);
-//		console.log('result', result);
-//		console.log('claim', claim);*/
-	}
-	async signMessage(message) {
-		try {
-			const result = await client.api.message.signMessage({ message });
-			console.log('onSignMessage finished');
-			console.log('onSignMessage signature', result.data);
-			return result;
-		} catch (e) {
-			console.log('onSignMessage error', e);
-		}
-	}
-
-	async issueClaim(sender, recipient, claim) {
+	async issueClaim(sender, subject, claim) {
 		console.log('issueClaim');
 		console.log('issueClaim sender', sender);
-		console.log('issueClaim recipient', recipient);
+		console.log('issueClaim subject', subject);
 		console.log('issueClaim claim', claim);
 
 		// Issue claim by ONT message signing
@@ -302,14 +193,14 @@ ab2hexstring(arr: any): string {
 
 		// Issue claim by ONT ID claim attestation
 //		var message = JSON.stringify(claim);
-		const result = await this.issueOntIdClaim(claim);
+		const result = await this.issueOntIdClaim(claim, subject);
 
 		this.setState({'signature': result})
 
 
 		var signed_certificate = {
 			'sender': sender,
-			'recipient': recipient,
+			'subject': subject,
 			'claim': claim,
 			'signature': result
 		};
@@ -344,48 +235,54 @@ ab2hexstring(arr: any): string {
 	handleSubmit(event) {
 		event.preventDefault();
 		var claim = {};
-		claim['Credential Name'] = this.state.certName;
-		claim['Recipient'] = this.state.certRecipient;
-		claim['Description'] = this.state.certDescription;
+		claim['Institution Name'] = this.state.certInstitutionName;
+		claim['Recipient ONT ID'] = this.state.certSubject;
+		claim['Course Name'] = this.state.certCourseName;
+		claim['Final Grade'] = this.state.certFinalGrade;
 
 		this.setState({'claim': claim});
 //		alert('A claim was submitted: ' + JSON.stringify(claim));
 
-		this.issueClaim(this.state.sender, this.state.recipient, claim);
+		this.issueClaim(this.state.sender, this.state.subject, claim);
 	}
 
 	render() {
 //		if(!this.state.name){return (<div>Loading</div>)}
 
+		// Types
 		return (
 			<div>
 			<h3>Issue Certificates</h3>
+			<p>Issuing a Certificate Costs 0.01 ONG</p>
 			<p>You are {this.state.name}</p>
-
-			<div><button onClick={this.addAttribute}>Add Attribute</button></div>
-
-			<div><button onClick={this.issueOntIdClaim}>Issue ONT ID Claim</button></div>
 
 			<form onSubmit={this.handleSubmit}>
 
+			<div className="form-group">
 				<div className="form-group">
-					<label>Crediential Name:</label>
+					<label>Institution Name:</label>
 					<div>
-						<textarea name="certName" value={this.state.certName} onChange={this.handleChange} required/>
+						<textarea name="certInstitutionName" value={this.state.certInstitutionName} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<label>Recipient ONT ID:</label>
+					<div>
+						<textarea name="certSubject" value={this.state.certSubject} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
 				<div className="form-group">
-					<label>Recipient:</label>
+					<label>Course Name:</label>
 					<div>
-						<textarea name="certRecipient" value={this.state.certRecipient} onChange={this.handleChange} required/>
+						<textarea name="certCourseName" value={this.state.certCourseName} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
 				<div className="form-group">
-					<label>Description:</label>
+					<label>Final Grade:</label>
 					<div>
-						<textarea name="certFor" value={this.state.certDescription} onChange={this.handleChange} required/>
+						<textarea name="certFinalGrade" value={this.state.certFinalGrade} onChange={this.handleChange} required/>
 					</div>
 				</div>
 
