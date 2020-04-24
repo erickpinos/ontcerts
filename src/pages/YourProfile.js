@@ -3,9 +3,12 @@ import '../App.css';
 
 import { client } from 'ontology-dapi';
 
+import { getAccount } from '../utils/ontology';
+
 var profiles = require('../data/profiles.js');
 
 client.registerClient({});
+
 
 export default class YourProfile extends React.Component {
 	constructor(props) {
@@ -23,10 +26,8 @@ export default class YourProfile extends React.Component {
 
 	async getProfile() {
 
-		// If web
-
 		try {
-		    const res = await client.api.asset.getAccount();
+		    const res = await getAccount();
 		    console.log(res)
 				console.log('account', res);
 	  		this.setState({account: res});
