@@ -3,11 +3,9 @@ import '../App.css';
 
 import { AirtableOntCerts } from '../utils/airtable';
 
-import { client } from 'ontology-dapi';
-
 import { issueClaim } from '../utils/ontology';
 
-client.registerClient({});
+import { getAccount, getIdentity } from '../utils/ontology';
 
 export default class IssueCertificate extends React.Component {
 
@@ -57,16 +55,16 @@ export default class IssueCertificate extends React.Component {
 	}
 
 	async getAccount() {
-		const account = await client.api.asset.getAccount();
+		const account = await getAccount();
 		this.setState({sender: account});
 	}
 
 	async getIssuerName() {
-		const account = await client.api.asset.getAccount();
+		const account = await getAccount();
 		console.log('account', account);
 
 		const profiles = this.state.profiles;
-		
+
 		for (let i = 0; i < profiles.length; i++) {
 			if (profiles[i].fields['account'] === this.state.sender) {
 				this.setState({
@@ -77,7 +75,7 @@ export default class IssueCertificate extends React.Component {
 	}
 
 	async getIdentity() {
-		const identity = await client.api.identity.getIdentity();
+		const identity = await getIdentity();
 		this.setState({identity: identity});
 	}
 

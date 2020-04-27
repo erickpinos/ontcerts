@@ -1,13 +1,54 @@
 import { client } from 'ontology-dapi';
+import { client as clientWeb } from 'ontology-dapi';
+import { client as clientMobile } from 'cyanobridge';
 import { Claim, Crypto, Merkle } from 'ontology-ts-sdk';
 import { str2hexstr } from '../utils/utils';
 
 const restUrl = 'http://polaris1.ont.io:20334';
 const socketUrl = 'ws://polaris1.ont.io:20335';
 
-client.registerClient({});
+//client.registerClient({});
+
+export async function getProvider() {
+
+  console.log('getProvider start');
+  var result = '';
+
+  try {
+    clientWeb.registerClient({});
+
+    const resultWeb = await clientWeb.api.provider.getProvider();
+    console.log('getProvider resultWeb', resultWeb);
+    result = resultWeb.name;
+  } catch(e) {
+    console.log('getProvider resultWeb failed');
+    console.log(e)
+  }
+
+  try {
+    clientMobile.registerClient({});
+    const resultMobile = await clientMobile.api.provider.getProvider();
+    console.log('getProvider resultMobile', resultMobile);
+    result = resultMobile.name;
+  } catch(e) {
+    console.log('getProvider resultMobile failed');
+    console.log(e)
+  }
+
+  console.log('getProvider result', result);
+
+  return result;
+}
 
 export async function getAccount() {
+  console.log("navigator Browser CodeName: ", navigator.appCodeName);
+  console.log("navigator Browser Name: ", navigator.appName);
+  console.log("navigator Browser Version: ", navigator.appVersion);
+  console.log("navigator Cookies Enabled: ", navigator.cookieEnabled);
+  console.log("navigator Browser Language: ", navigator.language);
+  console.log("navigator Browser Online: ", navigator.onLine);
+  console.log("navigator Platform: ", navigator.platform);
+  console.log("navigator User-agent header: ", navigator.userAgent);
   try {
     const result = await client.api.asset.getAccount();
     console.log('getAccount', result);

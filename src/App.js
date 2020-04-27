@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
 
-import { client } from 'ontology-dapi';
-
 import { Router, Route, Switch, NavLink } from 'react-router-dom';
 
 import history from './utils/history';
@@ -13,8 +11,6 @@ import ViewCertificates from './pages/ViewCertificates';
 import IssueCertificate from './pages/IssueCertificate';
 
 import { getAccount } from './utils/ontology';
-
-client.registerClient({});
 
 export default class App extends React.Component {
 	constructor(props) {

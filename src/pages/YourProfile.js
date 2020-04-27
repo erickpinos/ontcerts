@@ -1,12 +1,7 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'ontology-dapi';
-
 import { getAccount } from '../utils/ontology';
-
-client.registerClient({});
-
 
 export default class YourProfile extends React.Component {
 	constructor(props) {
@@ -67,34 +62,7 @@ export default class YourProfile extends React.Component {
 		} catch(err) {
 		    console.log(err)
 		}
-/*
-		// If mobile
-		const params = {
-		    dappName: 'My dapp',
-		    dappIcon: '' // some url points to the dapp icon
-		}
 
-		try {
-		    const res = await client.api.asset.getAccount(params);
-		    console.log(res.result)
-				console.log('account', res.result);
-	  		this.setState({account: res.result});
-
-				for (let i = 0; i < profiles.length; i++) {
-	  				if (profiles[i]['account'] === res.result) {
-	  					this.setState({
-	  						name: profiles[i].name,
-	  						email: profiles[i].email,
-	  						image: profiles[i].image
-	  					});
-	  				}
-	  		}
-
-		} catch(err) {
-		    console.log(err)
-		}
-
-*/
   	}
 
     render() {

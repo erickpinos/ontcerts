@@ -1,10 +1,6 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'ontology-dapi';
-
-client.registerClient({});
-
 export default class Issuers extends React.Component {
 
 		constructor(props) {

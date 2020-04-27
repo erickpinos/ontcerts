@@ -1,14 +1,11 @@
 import React from 'react';
 import '../App.css';
 
-import { client } from 'ontology-dapi';
 import { Claim } from 'ontology-ts-sdk';
 
 import Certificate from '../components/Certificate.js';
 
-import { getAccount, getIdentity } from '../utils/ontology';
-
-client.registerClient({});
+import { getAccount, getIdentity, getProvider } from '../utils/ontology';
 
 export default class ViewCertificates extends React.Component {
 
@@ -16,10 +13,18 @@ export default class ViewCertificates extends React.Component {
 		super(props);
 		this.state = {
 			claims: [],
-			publicKey: '',
 			account: '',
-			identity: ''
+			identity: '',
+			provider: ''
 		};
+	}
+
+	async getProvider() {
+		var result = await getProvider();
+
+			this.setState({
+					provider: result
+			});
 	}
 
 	isJsonString(str) {
@@ -69,30 +74,25 @@ export default class ViewCertificates extends React.Component {
 	   });
 	}
 
-	async getPublicKey() {
-		const publicKey = await client.api.asset.getPublicKey();
-		console.log('the public key is', publicKey);
-		this.setState({publicKey: publicKey});
-	}
-
 	async componentDidMount() {
-		this.getPublicKey();
-//		this.getLocalCertificates();
 		this.getAirtableClaims();
 		this.setState ({
 			account: await getAccount(),
 			identity: await getIdentity()
 		});
+		this.getProvider();
 	}
 
 	render() {
+
+		console.log(this.state.provider);
 
 		console.log('render claims', this.state.claims, 'length', this.state.claims.length);
 
 		return(
 			<div>
-
       <h3>View Certificates</h3>
+			<p>You are using {this.state.provider}</p>
 			<p>OntCert v1. This type of claim is issued by and recieved by the same ONT ID address.
 			The recipient ONT ID address is designated from within the claim contents, not from the 'subject' Address.
 			Claims must be issued directly from within the ONTcerts app.</p>
