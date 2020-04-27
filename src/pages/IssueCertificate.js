@@ -7,8 +7,6 @@ import { client } from 'ontology-dapi';
 
 import { issueClaim } from '../utils/ontology';
 
-var profiles = require('../data/profiles.js');
-
 client.registerClient({});
 
 export default class IssueCertificate extends React.Component {
@@ -27,7 +25,8 @@ export default class IssueCertificate extends React.Component {
 			certInstitutionName: 'BEN',
 			certSubject: 'Erick Pinos',
 			certCourseName: 'ERC20 Token',
-			certFinalGrade: 'Pass'
+			certFinalGrade: 'Pass',
+			profiles: ''
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -41,6 +40,20 @@ export default class IssueCertificate extends React.Component {
 		this.getAccount();
 		this.getIssuerName();
 		this.getIdentity();
+
+			const base = 'https://api.airtable.com/v0/app9EPqqBKTlihZgU/Issuers?api_key=';
+			const apiKey = process.env.REACT_APP_AIRTABLE_API_KEY;
+
+			fetch(base + apiKey)
+			.then((resp) => resp.json())
+			.then(data => {
+				console.log('getAirtableIssuers data', data);
+
+				this.setState({profiles: data.records});
+
+			 }).catch(err => {
+				console.log(err);
+			 });
 	}
 
 	async getAccount() {
@@ -52,10 +65,12 @@ export default class IssueCertificate extends React.Component {
 		const account = await client.api.asset.getAccount();
 		console.log('account', account);
 
+		const profiles = this.state.profiles;
+		
 		for (let i = 0; i < profiles.length; i++) {
-			if (profiles[i]['account'] === this.state.sender) {
+			if (profiles[i].fields['account'] === this.state.sender) {
 				this.setState({
-					name: profiles[i].name,
+					name: profiles[i].fields.name,
 				});
 			}
 		}

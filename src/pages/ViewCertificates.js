@@ -22,25 +22,6 @@ export default class ViewCertificates extends React.Component {
 		};
 	}
 
-
-	getLocalCertificates() {
-
-		var certificates = this.state.certificates;
-
-		for (let i = 0; i < 5; i++) {
-			try {
-				var certificate = require("../signed_certificates/certificate" + i + ".json");
-				certificates.push({'type': 'localCertificate', 'certificate': certificate});
-			} catch(e) {
-				console.log(e);
-			}
-		}
-
-		this.setState({
-			claims: certificates
-		});
-	}
-
 	isJsonString(str) {
 	    try {
 	        JSON.parse(str);

@@ -5,8 +5,6 @@ import { client } from 'ontology-dapi';
 
 import { getAccount } from '../utils/ontology';
 
-var profiles = require('../data/profiles.js');
-
 client.registerClient({});
 
 
@@ -19,12 +17,35 @@ export default class YourProfile extends React.Component {
 			account: '',
 			publicKey: '',
 			email: '',
-			image: ''
+			image: '',
+			profiles: ''
 		}
 
 	}
 
+	componentDidMount() {
+
+		const base = 'https://api.airtable.com/v0/app9EPqqBKTlihZgU/Issuers?api_key=';
+    const apiKey = process.env.REACT_APP_AIRTABLE_API_KEY;
+
+    fetch(base + apiKey)
+    .then((resp) => resp.json())
+    .then(data => {
+			console.log('getAirtableIssuers data', data);
+
+			this.setState({profiles: data.records});
+
+	   }).catch(err => {
+	   	console.log(err);
+	   });
+
+		 this.getProfile();
+
+	}
+
 	async getProfile() {
+
+		const profiles = this.state.profiles;
 
 		try {
 		    const res = await getAccount();
@@ -33,12 +54,12 @@ export default class YourProfile extends React.Component {
 	  		this.setState({account: res});
 
 				for (let i = 0; i < profiles.length; i++) {
-	  				if (profiles[i]['account'] === res) {
+	  				if (profiles[i]['fields']['account'] === res) {
 	  					this.setState({
-	  						name: profiles[i].name,
-	  						email: profiles[i].email,
-								publicKey: profiles[i].publicKey,
-	  						image: profiles[i].image
+	  						name: profiles[i].fields.name,
+	  						email: profiles[i].fields.email,
+								publicKey: profiles[i].fields.publicKey,
+	  						image: profiles[i].fields.image
 	  					});
 	  				}
 	  		}
@@ -76,15 +97,12 @@ export default class YourProfile extends React.Component {
 */
   	}
 
-  	componentDidMount() {
-
-  		this.getProfile();
-
-  	}
-
     render() {
 
+			const profiles = this.state.profiles;
+
       if(!profiles){return (<div>Loading</div>)}
+
 
 		console.log(profiles);
 		return (

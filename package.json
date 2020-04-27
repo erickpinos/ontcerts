@@ -2,18 +2,20 @@
   "name": "ontcerts",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "npm": "6.4.1",
+    "node": "10.15.3"
+  },
   "dependencies": {
     "airtable": "^0.8.1",
     "bootstrap": "^4.4.1",
     "cyanobridge": "^0.1.3",
-    "fs": "0.0.1-security",
     "ontology-dapi": "^0.4.9",
     "ontology-ts-sdk": "^1.1.1",
-    "react": "^16.13.0",
-    "react-csv": "^2.0.1",
-    "react-dom": "^16.13.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0"
+    "react-scripts": "3.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

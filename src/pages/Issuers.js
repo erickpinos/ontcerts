@@ -3,12 +3,36 @@ import '../App.css';
 
 import { client } from 'ontology-dapi';
 
-var profiles = require('../data/profiles.js');
-
 client.registerClient({});
 
-export default function Issuers() {
+export default class Issuers extends React.Component {
 
+		constructor(props) {
+			super(props);
+			this.state = {
+				identity: ''
+			};
+		}
+
+		componentDidMount() {
+
+			const base = 'https://api.airtable.com/v0/app9EPqqBKTlihZgU/Issuers?api_key=';
+	    const apiKey = process.env.REACT_APP_AIRTABLE_API_KEY;
+
+	    fetch(base + apiKey)
+	    .then((resp) => resp.json())
+	    .then(data => {
+				console.log('getAirtableIssuers data', data);
+
+				this.setState({profiles: data.records});
+
+		   }).catch(err => {
+		   	console.log(err);
+		   });
+		}
+
+		render() {
+			const profiles = this.state.profiles;
 		if(!profiles){return (<div>Loading</div>)}
 
 		console.log(profiles);
@@ -35,11 +59,11 @@ export default function Issuers() {
             <tbody>
 							{profiles.map(profile => (
 								<tr>
-									<td>{profile.name}</td>
-									<td>{profile.email}</td>
-									<td>{profile.account}</td>
-									<td>{profile.publicKey}</td>
-									<td><img src={profile.image} alt="profile" width="100px"/></td>
+									<td>{profile.fields.name}</td>
+									<td>{profile.fields.email}</td>
+									<td>{profile.fields.account}</td>
+									<td>{profile.fields.publicKey}</td>
+									<td><img src={profile.fields.image} alt="profile" width="100px"/></td>
 						    </tr>
               ))}
             </tbody>
@@ -48,4 +72,5 @@ export default function Issuers() {
       </div>
 			</div>
 		);
+}
 }

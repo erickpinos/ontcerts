@@ -1,9 +1,0 @@
-{
-  "sender": "03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e",
-  "recipient": "Erick",
-  "claim": "To Erick Pinos for completing Blockchain 101 on Tuesday Mar 17th.",
-  "signature": {
-    "data": "0135d92ddfcd0268b5c91d048530525877a433739b74dde86be41bd3c84da323353003cda3d447b393437776fa5ef65e19255e7a6451d037e4f0c3eb02b525fa90",
-    "publicKey": "03a5ad912c8f7df57f5528f4067b8f5b69e371097e43d9acb9325a2dbc0578373e"
-  }
-}

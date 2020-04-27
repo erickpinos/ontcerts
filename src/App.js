@@ -21,7 +21,6 @@ export default class App extends React.Component {
 		super(props);
 
 		this.state = {
-			signatures: ['','01551fad767d0224484695a14f3c89fb72a162cc04ea2ebd78b5146a66191072803d5ef812c2aee4e3e743ec556d2fc800fa0c5316ae4cf37d9ae8d238fde274f7'],
 			verified: '',
 			verifiedFrom: '',
 			connectedWallet: '',
