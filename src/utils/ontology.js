@@ -1,5 +1,5 @@
-import { client } from 'ontology-dapi';
-import { client as clientWeb } from 'ontology-dapi';
+import { client } from 'cyanobridge';
+//import { client as clientWeb } from 'ontology-dapi';
 import { client as clientMobile } from 'cyanobridge';
 import { Claim, Crypto, Merkle } from 'ontology-ts-sdk';
 import { str2hexstr } from '../utils/utils';
@@ -9,63 +9,76 @@ const socketUrl = 'ws://polaris1.ont.io:20335';
 
 //client.registerClient({});
 
-export async function getProvider() {
+export async function getAccount() {
 
-  console.log('getProvider start');
   var result = '';
 
   try {
+    var clientWeb = require('ontology-dapi').client;
     clientWeb.registerClient({});
 
-    const resultWeb = await clientWeb.api.provider.getProvider();
-    console.log('getProvider resultWeb', resultWeb);
-    result = resultWeb.name;
-  } catch(e) {
-    console.log('getProvider resultWeb failed');
-    console.log(e)
-  }
+    var clientWebResult = await clientWeb.api.asset.getAccount();
 
-  try {
-    clientMobile.registerClient({});
-    const resultMobile = await clientMobile.api.provider.getProvider();
-    console.log('getProvider resultMobile', resultMobile);
-    result = resultMobile.name;
-  } catch(e) {
-    console.log('getProvider resultMobile failed');
-    console.log(e)
-  }
+    result = clientWebResult;
 
-  console.log('getProvider result', result);
-
-  return result;
-}
-
-export async function getAccount() {
-  console.log("navigator Browser CodeName: ", navigator.appCodeName);
-  console.log("navigator Browser Name: ", navigator.appName);
-  console.log("navigator Browser Version: ", navigator.appVersion);
-  console.log("navigator Cookies Enabled: ", navigator.cookieEnabled);
-  console.log("navigator Browser Language: ", navigator.language);
-  console.log("navigator Browser Online: ", navigator.onLine);
-  console.log("navigator Platform: ", navigator.platform);
-  console.log("navigator User-agent header: ", navigator.userAgent);
-  try {
-    const result = await client.api.asset.getAccount();
-    console.log('getAccount', result);
     return result;
+
   } catch(e) {
-    console.log(e);
+    console.log(e)
   }
+
+
+  try {
+    var clientMobile = require('cyanobridge').client;
+    clientMobile.registerClient({});
+
+    const params = {dappName: 'My dapp', dappIcon: ''};
+
+    var clientMobileResult = await clientMobile.api.asset.getAccount(params);
+
+//    result = clientMobileResult.result;
+
+    return Promise.resolve(clientMobileResult.result);
+
+  } catch(e) {
+    console.log(e)
+  }
+
+
 }
 
 export async function getIdentity() {
+  var result = '';
+
   try {
-    const result = await client.api.identity.getIdentity();
-    console.log('getIdentity', result);
+    var clientWeb = require('ontology-dapi').client;
+    clientWeb.registerClient({});
+
+    var clientWebResult = await clientWeb.api.identity.getIdentity();
+
+    result = clientWebResult;
+
     return result;
+
   } catch(e) {
-    console.log(e);
+    console.log(e)
   }
+
+/*
+  try {
+    var clientMobile = require('cyanobridge').client;
+    clientMobile.registerClient({});
+
+    var clientMobileResult = await client.api.identity.getIdentity();
+
+    result = clientMobileResult.result;
+
+    return result;
+
+  } catch(e) {
+    console.log(e)
+  }
+*/
 }
 
 export async function issueClaim(claimContent) {

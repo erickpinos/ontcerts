@@ -5,7 +5,7 @@ import { Claim } from 'ontology-ts-sdk';
 
 import Certificate from '../components/Certificate.js';
 
-import { getAccount, getIdentity, getProvider } from '../utils/ontology';
+import { getAccount, getIdentity } from '../utils/ontology';
 
 export default class ViewCertificates extends React.Component {
 
@@ -17,14 +17,6 @@ export default class ViewCertificates extends React.Component {
 			identity: '',
 			provider: ''
 		};
-	}
-
-	async getProvider() {
-		var result = await getProvider();
-
-			this.setState({
-					provider: result
-			});
 	}
 
 	isJsonString(str) {
@@ -56,12 +48,12 @@ export default class ViewCertificates extends React.Component {
 				console.log('getAirtableClaims claim', claim);
 
 				// check if claim belongs to this address
-				console.log('getAirtableClaims claims.content["Recipient ONT ID"]', claim.content['Recipient ONT ID']);
-				console.log('getAirtableClaims this.state.account', this.state.account);
+				console.log('getAirtableClaims matchtest claims.content["Recipient ONT ID"]', claim.content['Recipient ONT ID']);
+				console.log('getAirtableClaims matchtest this.state.account', this.state.identity);
 
 				console.log('getAirtableClaims claims.metadata.issuer', claim.metadata.issuer);
 
-				if (claim.content['Recipient ONT ID'] === this.state.account || claim.metadata.issuer === this.state.identity) {
+				if (claim.content['Recipient ONT ID'] === this.state.identity || claim.metadata.issuer === this.state.identity) {
 					claims.push({'type': 'Online', 'certificate': claimSerialized});
 				}
 			}
@@ -75,27 +67,32 @@ export default class ViewCertificates extends React.Component {
 	}
 
 	async componentDidMount() {
+		console.log('mount');
 		this.getAirtableClaims();
+/*		this.setState ({
+			account: await getAccount(),
+			identity: await getIdentity()
+		});*/
 		this.setState ({
 			account: await getAccount(),
 			identity: await getIdentity()
 		});
-		this.getProvider();
+		console.log('testViewCertificates');
 	}
 
 	render() {
-
-		console.log(this.state.provider);
 
 		console.log('render claims', this.state.claims, 'length', this.state.claims.length);
 
 		return(
 			<div>
+			<div className="row">
+			<div className="col">
       <h3>View Certificates</h3>
-			<p>You are using {this.state.provider}</p>
-			<p>OntCert v1. This type of claim is issued by and recieved by the same ONT ID address.
-			The recipient ONT ID address is designated from within the claim contents, not from the 'subject' Address.
-			Claims must be issued directly from within the ONTcerts app.</p>
+			<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by and to a custodian ONT ID address. Thus, the 'Issuer' and 'Subject' addresses are the same.
+			The recipient of this particular type of certificate is designated from within the claim contents, not from the Subject field.</p>
+			</div>
+			</div>
 
 			<div className='certificates'>
 

@@ -32,11 +32,12 @@ export default class Issuers extends React.Component {
 		if(!profiles){return (<div>Loading</div>)}
 
 		console.log(profiles);
+
 		return (
 			<div className="Issuers">
       <div className="row">
         <div className="col">
-          <h3>Profiles</h3>
+          <h3>Verified Issuers</h3>
         </div>
       </div>
 
@@ -48,7 +49,6 @@ export default class Issuers extends React.Component {
                 <th>Name</th>
                 <th>Email</th>
 								<th>Account</th>
-								<th>Public Key</th>
 								<th>Image</th>
 	            </tr>
             </thead>
@@ -58,8 +58,7 @@ export default class Issuers extends React.Component {
 									<td>{profile.fields.name}</td>
 									<td>{profile.fields.email}</td>
 									<td>{profile.fields.account}</td>
-									<td>{profile.fields.publicKey}</td>
-									<td><img src={profile.fields.image} alt="profile" width="100px"/></td>
+									<td><img src={profile.fields.image[0].url} alt="profile" width="100px"/></td>
 						    </tr>
               ))}
             </tbody>

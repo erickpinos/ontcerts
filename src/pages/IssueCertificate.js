@@ -20,11 +20,12 @@ export default class IssueCertificate extends React.Component {
 			json: '',
 			name: '',
 			serializedJSON: '',
-			certInstitutionName: 'BEN',
-			certSubject: 'Erick Pinos',
-			certCourseName: 'ERC20 Token',
+			certInstitutionName: 'Blockchain Education Network',
+			certSubject: 'did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL',
+			certCourseName: 'Set Up ONT ID',
 			certFinalGrade: 'Pass',
-			profiles: ''
+			profiles: '',
+			submitted: ''
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -81,12 +82,15 @@ export default class IssueCertificate extends React.Component {
 
 	async issueClaim(claim) {
 
+		this.setState({submitted: 'yes'});
+
 		const result = await issueClaim(claim);
 		console.log('issueClaim result', result);
 
 		this.addClaimToAirtable(result);
 
 		this.setState({serializedJSON: result});
+		this.setState({submitted: 'done'});
 	}
 
 	async addClaimToAirtable(claimSerialized) {
@@ -129,9 +133,21 @@ export default class IssueCertificate extends React.Component {
 		// Types
 		return (
 			<div>
-			<h3>Issue Certificates</h3>
-			<p>Issuing a Certificate Costs 0.01 ONG</p>
-			<p>You are {this.state.name}</p>
+
+			<div className="row justify-content-center">
+				<h3>Issue Certificates</h3>
+			</div>
+			<div className="row justify-content-center">
+				<div className="col-8">
+					<div>
+						<p>Issuing a certificate costs 0.01 testnet ONG.
+							Certificates issued through this website are issued by the testnet ONT ID did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL
+							and paid for by the testnet wallet address AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL. Certificates are issued on the Polaris testnet.</p>
+					</div>
+				</div>
+			</div>
+
+			{ (this.state.submitted === '') && (
 
 			<form onSubmit={this.handleSubmit}>
 
@@ -167,6 +183,22 @@ export default class IssueCertificate extends React.Component {
 					<input type="submit" value="Submit" />
 				</div>
 		</form>
+	)
+}
+
+		{ (this.state.submitted === 'yes') && (
+			<div className="row justify-content-center">
+				<p>Submitting, please wait</p>
+			</div>
+		)
+	}
+
+	{ (this.state.submitted === 'done') && (
+		<div className="row justify-content-center">
+			<p>Submitted. View & verify your certificate in the 'View Certificates' tab.</p>
+		</div>
+	)
+}
 
 		{ (this.state.serializedJSON !== '') && (
 			<div className="row justify-content-center">
@@ -175,7 +207,6 @@ export default class IssueCertificate extends React.Component {
 					<code>
 							{this.state.serializedJSON}
 					</code>
-					<p>Save this serialized JSON somewhere safe. Your credential will be lost without it.</p>
 				</div>
 			</div>
 			)
