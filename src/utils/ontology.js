@@ -42,9 +42,13 @@ export async function getIdentity() {
 }
 
 export async function signMessage(message) {
-  const result = await client.api.message.signMessage({ message });
-  console.log('signMessage result', result);
-  return result;
+  try {
+    const result = await client.api.message.signMessage({ message });
+    console.log('signMessage result', result);
+    return result;
+  } catch(e) {
+    console.log('signMessage error', e)
+  }
 }
 
 export async function callSmartContract(scriptHash, operation, gasPrice, gasLimit, requireIdentity, parametersRaw) {
@@ -87,6 +91,8 @@ function convertValue(value: string, type: ParameterType) {
   }
 }
 
+
+
 export async function issueClaim(claimContent, payerPrivateKeyString, issuerPrivateKeyString, subjectOntid) {
 
   const timestamp = Date.now();
@@ -126,10 +132,12 @@ export async function issueClaim(claimContent, payerPrivateKeyString, issuerPriv
 //  claim.signature = Crypto.Signature.deserializeHex(dapiSign.data);
   let signatureDapi = Crypto.Signature.deserializeHex(dapiSign.data);
   const publicKeyStringReader = new StringReader(dapiSign.publicKey);
-  signatureDapi.publicKeyId = Crypto.PublicKey.deserializeHex(publicKeyStringReader);
+//  signatureDapi.publicKeyId = Crypto.PublicKey.deserializeHex(publicKeyStringReader);
+  signatureDapi.publicKeyId = issuerPublicKeyId;
 
   console.log('issueClaim claim signatureDapi', signatureDapi);
 
+  claim.signature = signatureDapi;
   // Sign claim with ontology-ts-sdk
   await claim.sign(restUrl, issuerPublicKeyId, issuerPrivateKey);
 
@@ -234,6 +242,7 @@ export async function verifySignature(claimSerialized) {
   const publicKey = await retrievePublicKey(signature.publicKeyId, restUrl);
   const msg = claim.serializeUnsigned(signature.algorithm, signature.publicKeyId);
   const msgHex = str2hexstr(msg);
+  console.log('testSignature publicKey', publicKey);
   console.log('testSignature publicKey.verify', publicKey.verify(msgHex, signature));
   return publicKey.verify(msgHex, signature);
 
