@@ -3,7 +3,7 @@ import '../App.css';
 
 import { AirtableOntCerts } from '../utils/airtable';
 
-import { issueClaim } from '../utils/ontology';
+import { issueClaim, signMessage } from '../utils/ontology';
 
 import { getAccount, getIdentity } from '../utils/ontology';
 
@@ -147,6 +147,7 @@ export default class IssueCertificate extends React.Component {
 						<p>Issuing a certificate costs 0.01 testnet ONG.
 							Certificates issued through this website are issued by the testnet ONT ID did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL
 							and paid for by the testnet wallet address AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL. Certificates are issued on the Polaris testnet.</p>
+							<p>Please paste the private key of the payer address and the issuing ONT ID address.</p>
 					</div>
 				</div>
 			</div>

@@ -2,7 +2,8 @@ import { client } from 'ontology-dapi';
 //import { client as clientWeb } from 'ontology-dapi';
 //import { client as clientMobile } from 'cyanobridge';
 import { Address, Claim, Crypto, Merkle, PublicKeyStatus, Message,
-RestClient, DDO, OntidContract, TransactionBuilder, Parameter, ParameterType, AbiInfo } from 'ontology-ts-sdk';
+RestClient, DDO, OntidContract, TransactionBuilder, Parameter, ParameterType, AbiInfo,
+Signature } from 'ontology-ts-sdk';
 //import { retrievePublicKey, retrievePublicKeyState } from 'ontology-ts-sdk/src/claim/message';
 import { reverseHex, str2hexstr, hexstr2str, StringReader, ab2str } from '../utils/utils';
 
@@ -40,6 +41,52 @@ export async function getIdentity() {
   }
 }
 
+export async function signMessage(message) {
+  const result = await client.api.message.signMessage({ message });
+  console.log('signMessage result', result);
+  return result;
+}
+
+export async function callSmartContract(scriptHash, operation, gasPrice, gasLimit, requireIdentity, parametersRaw) {
+
+    console.log('callSmartContract scriptHash', scriptHash);
+    console.log('callSmartContract operation', operation);
+    console.log('callSmartContract gasPrice', gasPrice);
+    console.log('callSmartContract gasLimit', gasLimit);
+    console.log('callSmartContract requireIdentity', requireIdentity);
+    console.log('callSmartContract parametersRaw', parametersRaw);
+  const args = parametersRaw.map((raw) => ({ type: raw.type, value: convertValue(raw.value, raw.type) }));
+  console.log('callSmartContract args', args);
+  try {
+    const result = await client.api.smartContract.invoke({
+      scriptHash,
+      operation,
+      args,
+      gasPrice,
+      gasLimit,
+      requireIdentity
+    });
+    console.log('callSmartContract finished, result:' + JSON.stringify(result));
+    return result;
+  } catch (e) {
+    alert('callSmartContract canceled');
+    console.log('callSmartContract error:', e);
+  }
+}
+
+function convertValue(value: string, type: ParameterType) {
+  switch (type) {
+    case 'Boolean':
+      return Boolean(value);
+    case 'Integer':
+      return Number(value);
+    case 'ByteArray':
+      return value;
+    case 'String':
+      return client.api.utils.strToHex(value);
+  }
+}
+
 export async function issueClaim(claimContent, payerPrivateKeyString, issuerPrivateKeyString, subjectOntid) {
 
   const timestamp = Date.now();
@@ -56,10 +103,10 @@ export async function issueClaim(claimContent, payerPrivateKeyString, issuerPriv
 
   // Write claim
   const signature = undefined;
-  const useProof = true;
+  const useProof = false;
 
   const claim = new Claim({
-      messageId: '2020/04/23',
+      messageId: issuerOntid + timestamp,
       issuer: issuerOntid,
       subject: subjectOntid,
       issuedAt: timestamp
@@ -68,25 +115,50 @@ export async function issueClaim(claimContent, payerPrivateKeyString, issuerPriv
   claim.context = 'https://example.com/template/v1';
   claim.content = claimContent;
 
-  // Sign claim
-
   console.log('issueClaim claim unsigned', claim);
+
+  // Sign claim with ontology-dapi
+  var msgForDapi = claim.serialize();
+  console.log('issueClaim msgForDapi', msgForDapi);
+
+  const dapiSign = await signMessage(msgForDapi);
+  console.log('issueClaim dapi signed', dapiSign);
+//  claim.signature = Crypto.Signature.deserializeHex(dapiSign.data);
+  let signatureDapi = Crypto.Signature.deserializeHex(dapiSign.data);
+  const publicKeyStringReader = new StringReader(dapiSign.publicKey);
+  signatureDapi.publicKeyId = Crypto.PublicKey.deserializeHex(publicKeyStringReader);
+
+  console.log('issueClaim claim signatureDapi', signatureDapi);
+
+  // Sign claim with ontology-ts-sdk
   await claim.sign(restUrl, issuerPublicKeyId, issuerPrivateKey);
 
+  console.log('issueClaim claim signatureTS', claim.signature);
+
   console.log('issueClaim claim signed', claim);
+
+//  await retrievePublicKey(publicKeyId, url);
+
 
   // Attest claim
   const gasFee = '500';
   const gasLimit = '20000';
 
-  const attestResult = await claim.attest(socketUrl, gasFee, gasLimit, payerAddress, payerPrivateKey);
-  console.log('issueClaim attestResult', attestResult);
+//  const attestResult = await claim.attest(socketUrl, gasFee, gasLimit, payerAddress, payerPrivateKey);
+//  console.log('issueClaim attestResult', attestResult);
 //		txhash "00fbe7b186c9fef8861c9d5ce83a53fc9a0f82b82aaa94c55fc054bc08c021af";
+
+  const dapiAttestResult = await buildCommitRecordTx(claim.metadata.messageId, claim.metadata.issuer, claim.metadata.subject, gasFee, gasLimit, payerAddress);
 
   console.log('issueClaim claim attested', claim);
 
+  console.log('issueClaim dapiAttestResult', dapiAttestResult);
+  console.log('issueClaim dapiAttestResult.transaction', dapiAttestResult.transaction);
+
   const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
-  const proof = await Merkle.constructMerkleProof(restUrl, attestResult.Result.TxHash, contract);
+// proof for ts-sdk
+//   const proof = await Merkle.constructMerkleProof(restUrl, attestResult.Result.TxHash, contract);
+  const proof = await Merkle.constructMerkleProof(restUrl, dapiAttestResult.transaction, contract);
 
   claim.proof = proof;
   console.log('issueClaim claim with proof clamtomatch', claim);
@@ -447,6 +519,45 @@ export enum Status {
 }
 
 */
+
+
+/**
+ * Attests the claim.
+ *
+ * @param claimId Unique id of the claim
+ * @param issuer Issuer's ONT ID
+ * @param subject Subject's ONT ID
+ * @param gasPrice Gas price
+ * @param gasLimit Gas limit
+ * @param payer Payer's address
+ */
+export async function buildCommitRecordTx(claimId: string, issuer: string, subject: string,
+                                    gasPrice: string, gasLimit: string, payer: Address)  {
+    const f = abiInfo.getFunction('Commit');
+    if (issuer.substr(0, 3) === 'did') {
+        issuer = str2hexstr(issuer);
+    }
+    if (subject.substr(0, 3) === 'did') {
+        subject = str2hexstr(issuer);
+    }
+    console.log('buildCommitRecordTx issuer', issuer);
+    console.log('buildCommitRecordTx subject', subject);
+    console.log('buildCommitRecordTx claimId', str2hexstr(claimId));
+
+    const p1 = new Parameter(f.parameters[0].getName(), ParameterType.ByteArray, str2hexstr(claimId));
+    const p2 = new Parameter(f.parameters[1].getName(), ParameterType.ByteArray, issuer);
+    const p3 = new Parameter(f.parameters[2].getName(), ParameterType.ByteArray, subject);
+
+//    let tx = new Transaction();
+//    tx = makeInvokeTransaction(f.name, [p1, p2, p3], contractAddress, gasPrice, gasLimit, payer);
+
+
+    const parametersRaw = [p1, p2, p3];
+//    callSmartContract(contractAddress, f.name, gasPrice, gasLimit, false, parametersRaw);
+    return await callSmartContract(contractHash, f.name, gasPrice, gasLimit, false, parametersRaw);
+
+//    return tx;
+}
 
 {/*
 export async function getAccount() {

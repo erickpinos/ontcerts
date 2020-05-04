@@ -79,8 +79,8 @@ export default class ViewCertificates extends React.Component {
 			<div className="row">
 			<div className="col">
       <h3>View Certificates</h3>
-			<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by and to a custodian ONT ID address. Thus, the 'Issuer' and 'Subject' addresses are the same.
-			The recipient of this particular type of certificate is designated from within the claim contents, not from the Subject field.</p>
+			<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by a custodian ONT ID address.
+			The recipient of this particular type of certificate is designated from the Subject field.</p>
 			</div>
 			</div>
 
