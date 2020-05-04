@@ -111,9 +111,8 @@ export async function testBlockchain(claimSerialized) {
 
   const claim = Claim.deserialize(claimSerialized);
 
-  console.log('testBlockchain claim claimtomatch', claim);
+  console.log('testBlockchain claim', claim);
 
-  // Test if the claim is stored on the blockchain.
   const result = await claim.verify(restUrl, true);
   console.log('testBlockchain result', result);
   const resultSig = await claim.verify(restUrl, false);
@@ -125,6 +124,92 @@ export async function testBlockchain(claimSerialized) {
   console.log('testBlockchain getStatus', resultAttest2);
 
   return result;
+}
+
+export async function verifyExpiration(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('testSignature verifyExpiration', claim.verifyExpiration());
+  return claim.verifyExpiration();
+}
+
+export async function verifyKeyOwnership(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('testSignature verifyKeyOwnership', claim.verifyKeyOwnership());
+  return claim.verifyKeyOwnership();
+}
+
+export async function verifyNotRevoked(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  const signature = claim.signature;
+
+  const state = await retrievePublicKeyState(signature.publicKeyId, restUrl);
+  console.log('testSignature state', state);
+
+  if (state === Crypto.PublicKeyStatus.REVOKED) {
+    console.log('testSignature PublicKeyStatus.REVOKED revoked');
+    return false
+  } else {
+    console.log('testSignature PublicKeyStatus.REVOKED not revoked');
+    return true
+  }
+}
+
+export async function verifySignature(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+
+  const signature = claim.signature;
+
+  const publicKey = await retrievePublicKey(signature.publicKeyId, restUrl);
+  const msg = claim.serializeUnsigned(signature.algorithm, signature.publicKeyId);
+  const msgHex = str2hexstr(msg);
+  console.log('testSignature publicKey.verify', publicKey.verify(msgHex, signature));
+  return publicKey.verify(msgHex, signature);
+
+}
+
+export async function verifyMatchingClaimId(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+
+  const attesterId = claim.metadata.issuer;
+  const claimId = claim.metadata.messageId;
+  if (claimId === undefined) {
+      throw new Error('Claim id not specified.');
+  }
+//    return result.status === Status.ATTESTED && result.issuerId === attesterId;
+
+  const client = new RestClient(restUrl);
+  const tx = buildGetRecordStatusTx(claimId);
+
+  const response = await client.sendRawTransaction(tx.serialize(), true);
+
+  const result = GetStatusResponse.deserialize(response);
+  // console.log('status: ' + JSON.stringify(result));
+
+  console.log('testBlockchain getStatus custom result', result);
+  console.log('testBlockchain getStatus testing is issuerId matches this attesterid', result.issuerId === attesterId);
+  return result.issuerId === attesterId;
+}
+
+export async function verifyAttestStatus(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+
+  const attesterId = claim.metadata.issuer;
+  const claimId = claim.metadata.messageId;
+  if (claimId === undefined) {
+      throw new Error('Claim id not specified.');
+  }
+//    return result.status === Status.ATTESTED && result.issuerId === attesterId;
+
+  const client = new RestClient(restUrl);
+  const tx = buildGetRecordStatusTx(claimId);
+
+  const response = await client.sendRawTransaction(tx.serialize(), true);
+
+  const result = GetStatusResponse.deserialize(response);
+  // console.log('status: ' + JSON.stringify(result));
+
+  console.log('testBlockchain getStatus custom result', result);
+  return result.status === '01';
 }
 
 export async function testSignature(claimSerialized, claimIssuer) {
@@ -281,6 +366,7 @@ async function getStatus(claim, url: string) {
     if (claimId === undefined) {
         throw new Error('Claim id not specified.');
     }
+//    return result.status === Status.ATTESTED && result.issuerId === attesterId;
 
     const client = new RestClient(url);
     const tx = buildGetRecordStatusTx(claimId);

@@ -4,7 +4,8 @@ import '../App.css';
 import { Claim } from 'ontology-ts-sdk';
 
 import { getAccount, getIdentity, testBlockchain,
-	testSignature } from '../utils/ontology';
+	testSignature, verifyExpiration, verifyKeyOwnership, verifyNotRevoked,
+	verifySignature, verifyMatchingClaimId, verifyAttestStatus } from '../utils/ontology';
 
 import { getIssuerByAccount } from '../utils/airtable';
 
@@ -20,7 +21,13 @@ export default class Certificate extends React.Component {
 			'certificateType': this.props.certificate.type,
 			'testBlockchain': '',
 			'testSignature': '',
-			'issuerName': ''
+			'issuerName': '',
+			'verifyExpiration': '',
+			'verifyKeyOwnership': '',
+			'verifyNotRevoked': '',
+			'verifySignature': '',
+			'verifyMatchingClaimId': '',
+			'verifyAttestStatus': ''
     };
 		this.verifyClaim = this.verifyClaim.bind(this);
 
@@ -66,6 +73,13 @@ export default class Certificate extends React.Component {
 	    this.setState({testSignature: 'failed'});
 	  }
 
+		const verifyExpirationTest = await verifyExpiration(this.state.claimSerialized);
+		this.setState({verifyExpiration: JSON.stringify(verifyExpirationTest)});
+		this.setState({verifyKeyOwnership: JSON.stringify(await verifyKeyOwnership(this.state.claimSerialized))});
+		this.setState({verifyNotRevoked: JSON.stringify(await verifyNotRevoked(this.state.claimSerialized))});
+		this.setState({verifySignature: JSON.stringify(await verifySignature(this.state.claimSerialized))});
+		this.setState({verifyMatchingClaimId: JSON.stringify(await verifyMatchingClaimId(this.state.claimSerialized))});
+		this.setState({verifyAttestStatus: JSON.stringify(await verifyAttestStatus(this.state.claimSerialized))});
 	}
 
   render() {
@@ -112,8 +126,14 @@ export default class Certificate extends React.Component {
 		  			<button onClick={() => this.verifyClaim()}>Verify Certificate</button>
 						{this.state.testBlockchain !== '' && (
 							<React.Fragment>
-			          <p>Blockchain test: {this.state.testBlockchain}</p>
-			          <p>Signature test: {this.state.testSignature}</p>
+								<p>verifyExpiration: {this.state.verifyExpiration}</p>
+								<p>verifyKeyOwnership: {this.state.verifyKeyOwnership}</p>
+								<p>verifyNotRevoked: {this.state.verifyNotRevoked}</p>
+								<p>verifySignature: {this.state.verifySignature}</p>
+								<p>Signature test: {this.state.testSignature}</p>
+								<p>verifyMatchingClaimId: {this.state.verifyMatchingClaimId}</p>
+								<p>verifyAttestStatus: {this.state.verifyAttestStatus}</p>
+								<p>Blockchain test: {this.state.testBlockchain}</p>
 								{this.state.testSignature === 'testing' && (
 									<p>Testing if this certificate has a valid signature from {claim.metadata.issuer} </p>
 								)}
