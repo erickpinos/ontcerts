@@ -14,8 +14,7 @@ export default class ViewCertificates extends React.Component {
 		this.state = {
 			claims: [],
 			account: '',
-			identity: '',
-			provider: ''
+			identity: ''
 		};
 	}
 
@@ -38,13 +37,13 @@ export default class ViewCertificates extends React.Component {
 				const claim = Claim.deserialize(claimSerialized);
 				console.log('getAirtableClaims claim', claim);
 
-				// check if claim belongs to this address
+				// Check if claim belongs to this address
 				console.log('getAirtableClaims this.state.identity', this.state.identity);
 				console.log('getAirtableClaims claim.metadata.issuer', claim.metadata.issuer);
 				console.log('getAirtableClaims claim.metadata.subject', claim.metadata.subject);
 
 				if (claim.metadata.subject === this.state.identity || claim.metadata.issuer === this.state.identity) {
-					claims.push({'type': 'Online', 'certificate': claimSerialized});
+					claims.push({'type': 'Online', 'certificate': claim});
 				}
 			}
 
@@ -57,42 +56,34 @@ export default class ViewCertificates extends React.Component {
 	}
 
 	async componentDidMount() {
-		console.log('mount');
 		this.getAirtableClaims();
-/*		this.setState ({
-			account: await getAccount(),
-			identity: await getIdentity()
-		});*/
 		this.setState ({
 			account: await getAccount(),
 			identity: await getIdentity()
 		});
-		console.log('testViewCertificates');
 	}
 
 	render() {
 
-		console.log('render claims', this.state.claims, 'length', this.state.claims.length);
-
 		return(
-			<div>
-			<div className="row">
-			<div className="col">
-      <h3>View Certificates</h3>
-			<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by a custodian ONT ID address.
-			The recipient of this particular type of certificate is designated from the Subject field.</p>
-			</div>
-			</div>
+			<div className="ViewCertificates">
+				<div className="row">
+					<div className="col">
+			      <h3>View Certificates</h3>
+						<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by a custodian ONT ID address.
+						The recipient of this particular type of certificate is designated from the Subject field.</p>
+					</div>
+				</div>
 
-			<div className='certificates'>
+				<div className='certificates'>
 
-				{this.state.claims && (
-					<React.Fragment>
-						{this.state.claims.map((currElement, index) => <Certificate key={index} certificate={currElement} />)}
-					</React.Fragment>
-				)}
+					{this.state.claims && (
+						<React.Fragment>
+							{this.state.claims.map((currElement, index) => <Certificate key={index} certificate={currElement} />)}
+						</React.Fragment>
+					)}
 
-			</div>
+				</div>
 
 			</div>
 		);

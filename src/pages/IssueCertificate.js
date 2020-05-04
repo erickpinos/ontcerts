@@ -3,7 +3,7 @@ import '../App.css';
 
 import { AirtableOntCerts } from '../utils/airtable';
 
-import { issueClaim, signMessage } from '../utils/ontology';
+import { issueClaimTS, signMessage } from '../utils/ontology';
 
 import { getAccount, getIdentity } from '../utils/ontology';
 
@@ -88,7 +88,7 @@ export default class IssueCertificate extends React.Component {
 
 		const subject = this.state.certSubject;
 
-		const result = await issueClaim(claim, this.state.payerPrivateKey, this.state.issuerPrivateKey, subject);
+		const result = await issueClaimTS(claim, this.state.payerPrivateKey, this.state.issuerPrivateKey, subject);
 		console.log('issueClaim result', result);
 
 		this.addClaimToAirtable(result);
