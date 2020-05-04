@@ -162,7 +162,7 @@ export async function issueClaimDapi(claimContent, subjectOntid, issuerPrivateKe
 
   console.log('issueClaim msg deserialized claimtomatch', msg);
 
-  const verifyResult = await verify(signed);
+  const verifyResult = await verify(msg);
   console.log('issueClaim verifyResult', verifyResult);
 
   return signed;
@@ -206,9 +206,9 @@ export async function issueClaimTS(claimContent, payerPrivateKeyString, issuerPr
   console.log('issueClaim claim serialized', signed);
 
 
-//  const msg = Claim.deserialize(signed);
+  const msg = Claim.deserialize(signed);
 //  console.log('issueClaim msg deserialized claimtomatch', msg);
-  const verifyResult = await verify(signed);
+  const verifyResult = await verify(msg);
   console.log('issueClaim verifyResult', verifyResult);
 
   return signed;

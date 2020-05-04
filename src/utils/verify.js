@@ -10,9 +10,7 @@ const contractAddress = new Crypto.Address(reverseHex(contractHash));
 // ONT Node URL Info
 const restUrl = 'http://polaris1.ont.io:20334';
 
-export async function verify(claimSerialized) {
-
-  const claim = Claim.deserialize(claimSerialized);
+export async function verify(claim) {
 
   console.log('verify claim', claim);
 
@@ -28,38 +26,35 @@ export async function verify(claimSerialized) {
   const resultVerifyGetStatusCustom = await getStatus(claim, restUrl);
   console.log('verify resultVerifyGetStatusCustom', resultVerifyGetStatusCustom);
 
-  const resultVerifyExpiration = await verifyExpiration(claimSerialized);
+  const resultVerifyExpiration = await verifyExpiration(claim);
   console.log('verify resultVerifyExpiration', resultVerifyExpiration);
 
-  const resultVerifyKeyOwnership = await verifyKeyOwnership(claimSerialized);
+  const resultVerifyKeyOwnership = await verifyKeyOwnership(claim);
   console.log('verify resultVerifyKeyOwnership', resultVerifyKeyOwnership);
 
-  const resultVerifyNotRevoked = await verifyNotRevoked(claimSerialized);
+  const resultVerifyNotRevoked = await verifyNotRevoked(claim);
   console.log('verify resultVerifyNotRevoked', resultVerifyNotRevoked);
 
-  const resultVerifyMatchingClaimId = await verifyMatchingClaimId(claimSerialized);
+  const resultVerifyMatchingClaimId = await verifyMatchingClaimId(claim);
   console.log('verify resultVerifyMatchingClaimId', resultVerifyMatchingClaimId);
 
-  const resultVerifyAttestStatus = await verifyAttestStatus(claimSerialized);
+  const resultVerifyAttestStatus = await verifyAttestStatus(claim);
   console.log('verify resultVerifyAttestStatus', resultVerifyAttestStatus);
 
   return resultVerifySignatureAndAttestStatus;
 }
 
-export async function verifyExpiration(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
+export async function verifyExpiration(claim) {
   console.log('verifyExpiration', claim.verifyExpiration());
   return claim.verifyExpiration();
 }
 
-export async function verifyKeyOwnership(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
+export async function verifyKeyOwnership(claim) {
   console.log('verifyKeyOwnership', claim.verifyKeyOwnership());
   return claim.verifyKeyOwnership();
 }
 
-export async function verifyNotRevoked(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
+export async function verifyNotRevoked(claim) {
   const signature = claim.signature;
 
   const state = await retrievePublicKeyState(signature.publicKeyId, restUrl);
@@ -73,9 +68,7 @@ export async function verifyNotRevoked(claimSerialized) {
   }
 }
 
-export async function verifySignature(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
-
+export async function verifySignature(claim) {
   const signature = claim.signature;
 
   const publicKey = await retrievePublicKey(signature.publicKeyId, restUrl);
@@ -84,12 +77,9 @@ export async function verifySignature(claimSerialized) {
 //  console.log('testSignature publicKey', publicKey);
 //  console.log('testSignature publicKey.verify', publicKey.verify(msgHex, signature));
   return publicKey.verify(msgHex, signature);
-
 }
 
-export async function verifyMatchingClaimId(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
-
+export async function verifyMatchingClaimId(claim) {
   const attesterId = claim.metadata.issuer;
   const claimId = claim.metadata.messageId;
   if (claimId === undefined) {
@@ -110,8 +100,7 @@ export async function verifyMatchingClaimId(claimSerialized) {
   return result.issuerId === attesterId;
 }
 
-export async function verifyAttestStatus(claimSerialized) {
-  const claim = Claim.deserialize(claimSerialized);
+export async function verifyAttestStatus(claim) {
 
   const attesterId = claim.metadata.issuer;
   const claimId = claim.metadata.messageId;
