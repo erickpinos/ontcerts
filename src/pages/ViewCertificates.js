@@ -19,15 +19,6 @@ export default class ViewCertificates extends React.Component {
 		};
 	}
 
-	isJsonString(str) {
-	    try {
-	        JSON.parse(str);
-	    } catch (e) {
-	        return false;
-	    }
-	    return true;
-	}
-
 	getAirtableClaims() {
 
 		const base = 'https://api.airtable.com/v0/app9EPqqBKTlihZgU/Claims?api_key=';
@@ -48,12 +39,11 @@ export default class ViewCertificates extends React.Component {
 				console.log('getAirtableClaims claim', claim);
 
 				// check if claim belongs to this address
-				console.log('getAirtableClaims matchtest claims.content["Recipient ONT ID"]', claim.content['Recipient ONT ID']);
-				console.log('getAirtableClaims matchtest this.state.account', this.state.identity);
+				console.log('getAirtableClaims this.state.identity', this.state.identity);
+				console.log('getAirtableClaims claim.metadata.issuer', claim.metadata.issuer);
+				console.log('getAirtableClaims claim.metadata.subject', claim.metadata.subject);
 
-				console.log('getAirtableClaims claims.metadata.issuer', claim.metadata.issuer);
-
-				if (claim.content['Recipient ONT ID'] === this.state.identity || claim.metadata.issuer === this.state.identity) {
+				if (claim.metadata.subject === this.state.identity || claim.metadata.issuer === this.state.identity) {
 					claims.push({'type': 'Online', 'certificate': claimSerialized});
 				}
 			}

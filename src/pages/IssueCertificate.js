@@ -25,7 +25,9 @@ export default class IssueCertificate extends React.Component {
 			certCourseName: 'Set Up ONT ID',
 			certFinalGrade: 'Pass',
 			profiles: '',
-			submitted: ''
+			submitted: '',
+			payerPrivateKey: '7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97',
+			issuerPrivateKey: '7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97'
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -84,7 +86,9 @@ export default class IssueCertificate extends React.Component {
 
 		this.setState({submitted: 'yes'});
 
-		const result = await issueClaim(claim);
+		const subject = this.state.certSubject;
+
+		const result = await issueClaim(claim, this.state.payerPrivateKey, this.state.issuerPrivateKey, subject);
 		console.log('issueClaim result', result);
 
 		this.addClaimToAirtable(result);
@@ -119,8 +123,8 @@ export default class IssueCertificate extends React.Component {
 	handleSubmit(event) {
 		event.preventDefault();
 		var claimContent = {};
-		claimContent['Institution Name'] = this.state.certInstitutionName;
-		claimContent['Recipient ONT ID'] = this.state.certSubject;
+//		claimContent['Institution Name'] = this.state.certInstitutionName;
+//		claimContent['Recipient ONT ID'] = this.state.certSubject;
 		claimContent['Course Name'] = this.state.certCourseName;
 		claimContent['Final Grade'] = this.state.certFinalGrade;
 
@@ -153,12 +157,26 @@ export default class IssueCertificate extends React.Component {
 
 			<div className="form-group">
 				<div className="form-group">
+					<label>Payer Private Key:</label>
+					<div>
+						<textarea name="payerPrivateKey" value={this.state.payerPrivateKey} onChange={this.handleChange} required/>
+					</div>
+				</div>
+
+				<div className="form-group">
+					<label>Issuer Private Key:</label>
+					<div>
+						<textarea name="issuerPrivateKey" value={this.state.issuerPrivateKey} onChange={this.handleChange} required/>
+					</div>
+				</div>
+{/*
+				<div className="form-group">
 					<label>Institution Name:</label>
 					<div>
 						<textarea name="certInstitutionName" value={this.state.certInstitutionName} onChange={this.handleChange} required/>
 					</div>
 				</div>
-
+*/}
 				<label>Recipient ONT ID:</label>
 					<div>
 						<textarea name="certSubject" value={this.state.certSubject} onChange={this.handleChange} required/>

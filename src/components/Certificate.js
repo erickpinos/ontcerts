@@ -6,6 +6,8 @@ import { Claim } from 'ontology-ts-sdk';
 import { getAccount, getIdentity, testBlockchain,
 	testSignature } from '../utils/ontology';
 
+import { getIssuerByAccount } from '../utils/airtable';
+
 export default class Certificate extends React.Component {
 	constructor(props) {
     super(props);
@@ -17,7 +19,8 @@ export default class Certificate extends React.Component {
 			'claimSerialized': this.props.certificate.certificate,
 			'certificateType': this.props.certificate.type,
 			'testBlockchain': '',
-			'testSignature': ''
+			'testSignature': '',
+			'issuerName': ''
     };
 		this.verifyClaim = this.verifyClaim.bind(this);
 
@@ -31,6 +34,12 @@ export default class Certificate extends React.Component {
 		try {
 			this.setState({
 				'claimDeserialized': Claim.deserialize(this.state.claimSerialized)
+			});
+
+			const issuer = await getIssuerByAccount(this.state.claimDeserialized.metadata.issuer);
+
+			this.setState({
+				issuerName: issuer.fields.name
 			});
 		} catch(e) {
 			console.log(e);
@@ -50,7 +59,7 @@ export default class Certificate extends React.Component {
 	    this.setState({testBlockchain: 'failed'});
 	  }
 
-		const testSignatureResult = await testSignature(this.state.claimSerialized);
+		const testSignatureResult = await testSignature(this.state.claimSerialized, this.state.claimDeserialized.metadata.issuer);
 		if (testSignatureResult === true) {
 	    this.setState({testSignature: 'passed'});
 		} else {
@@ -65,7 +74,6 @@ export default class Certificate extends React.Component {
 			const claim = this.state.claimDeserialized;
 	    const certificateType = this.state.certificateType;
 
-
 			try {
 				var certContents = Object.keys(claim.content).map(function(key, index) {
 					return (<div key={index} id={key}><span className="font-weight-bold">{key}</span> {JSON.stringify(claim.content[key])}</div>)
@@ -75,6 +83,8 @@ export default class Certificate extends React.Component {
 			}
 
 			var issuedAt = new Date(claim.metadata.issuedAt);
+
+			console.log('issuer', claim.metadata.issuer);
 
 			return (
 		    <div className="row justify-content-center">
@@ -86,13 +96,14 @@ export default class Certificate extends React.Component {
 							<div><span className="font-weight-bold">Issued By You</span></div>
 						)}
 
-						{claim.content['Recipient ONT ID'] === this.state.identity && (
+						{claim.metadata.subject === this.state.identity && (
 							<div><span className="font-weight-bold">Issued To You</span></div>
 						)}
 
 						<div><span className="font-weight-bold">Stored</span> {certificateType} </div>
-
+						<div><span className="font-weight-bold">Claim ID</span> {claim.metadata.messageId} </div>
 						<div><span className="font-weight-bold">Issuer</span> {claim.metadata.issuer} </div>
+						<div><span className="font-weight-bold">Issuer Name</span> {this.state.issuerName} </div>
 						<div><span className="font-weight-bold">Subject</span> {claim.metadata.subject} </div>
 						<div><span className="font-weight-bold">Issued On</span> {issuedAt.toUTCString()} </div>
 
@@ -103,6 +114,15 @@ export default class Certificate extends React.Component {
 							<React.Fragment>
 			          <p>Blockchain test: {this.state.testBlockchain}</p>
 			          <p>Signature test: {this.state.testSignature}</p>
+								{this.state.testSignature === 'testing' && (
+									<p>Testing if this certificate has a valid signature from {claim.metadata.issuer} </p>
+								)}
+								{this.state.testSignature === 'failed' && (
+									<p>This certificate did not come from {claim.metadata.issuer} or it has been tampered with.</p>
+								)}
+								{this.state.testSignature === 'passed' && (
+									<p>This certificate came from {claim.metadata.issuer} and has not been tampered with.</p>
+								)}
 							</React.Fragment>
 						)}
 		  			</div>
@@ -111,7 +131,8 @@ export default class Certificate extends React.Component {
 		  	</div>
 		  );
 		} catch(e) {
-			return (<div>Invalid Certificate</div>)
+			console.log('Certificate render error', e);
+			return (<div>Invalid Certificate</div>);
 		}
 	}
 }

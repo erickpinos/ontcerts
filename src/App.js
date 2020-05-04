@@ -83,7 +83,6 @@ export default class App extends React.Component {
 						<p className="App-link">ONTcerts</p>
 						<h5 style={{wordBreak: 'break-word'}}> Connected Wallet: {this.state.connectedWallet}</h5>
 						<h5 style={{wordBreak: 'break-word'}}> Connected DID: {this.state.connectedDID}</h5>
-						<h5> Welcome, {this.state.connectedNickName}</h5>
 					</header>
 
 					<div className="header-nav" style={{backgroundColor: '#000', marginBottom: '20px'}}>
