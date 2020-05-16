@@ -97,37 +97,66 @@ function convertValue(value: string, type: ParameterType) {
 
 export async function issueClaimDapi(claimContent, subjectOntid, issuerPrivateKeyString) {
 
-  const issuerPrivateKey = new Crypto.PrivateKey(issuerPrivateKeyString);
+  console.log('issueClaimDapi issuerPrivateKeyString', issuerPrivateKeyString);
+  const issuerPrivateKeyTS = Crypto.PrivateKey.deserializeWIF('Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8');
+  console.log('issueClaimDapi issuerPrivateKeyTS', issuerPrivateKeyTS);
+
+  const issuerPublicKeyTS = issuerPrivateKeyTS.getPublicKey();
+  console.log('issueClaimDapi issuerPublicKeyTS', issuerPublicKeyTS);
+
+  const issuerOntidTS = Crypto.Address.generateOntid(issuerPublicKeyTS);
+  console.log('issueClaimDapi issuerOntidTS', issuerOntidTS);
+
+  const issuerPublicKeyIdTS = issuerOntidTS + '#keys-1';
+  console.log('issueClaimDapi issuerPublicKeyIdTS', issuerPublicKeyIdTS);
+
+  const issuerAccount = await getAccount();
+  console.log('issueClaimDapi issuerAccount', issuerAccount);
+
+  const issuerPublicKey = await getPublicKey();
+  console.log('issueClaimDapi issuerPublicKey', issuerPublicKey);
 
   const issuerOntid = await getIdentity();
+  console.log('issueClaimDapi issuerOntid', issuerOntid);
+
   const issuerPublicKeyId = issuerOntid + '#keys-1';
+  console.log('issueClaimDapi issuerPublicKeyId', issuerPublicKeyId);
 
   let claim = await writeClaim(issuerOntid, subjectOntid, claimContent);
+  let claimTS = await writeClaim(issuerOntid, subjectOntid, claimContent);
 
   console.log('issueClaimDapi claim unsigned', claim);
+  console.log('issueClaimDapi claimTS unsigned', claimTS);
+
+  const algorithmTS = issuerPrivateKeyTS.algorithm.defaultSchema;
+  console.log('issuerClaimDapi algorithmTS', algorithmTS);
 
   // Sign claim with ontology-dapi
-  var msgForDapi = claim.serialize();
+  const msgForDapi = claim.serializeUnsigned(algorithmTS, issuerPublicKeyId);
   console.log('issueClaimDapi msgForDapi', msgForDapi);
-
   const dapiSign = await signMessage(msgForDapi);
- console.log('issueClaim dapi signed', dapiSign);
+  console.log('issueClaim dapi signed', msgForDapi);
 //  claim.signature = Crypto.Signature.deserializeHex(dapiSign.data);
   let signatureDapi = Crypto.Signature.deserializeHex(dapiSign.data);
   const publicKeyStringReader = new StringReader(dapiSign.publicKey);
 //  signatureDapi.publicKeyId = Crypto.PublicKey.deserializeHex(publicKeyStringReader);
   signatureDapi.publicKeyId = issuerPublicKeyId;
 
-  console.log('issueClaimDapi claim signatureDapi', signatureDapi);
 
   claim.signature = signatureDapi;
 
-  // Sign claim with ontology-ts-sdk
-  await claim.sign(restUrl, issuerPublicKeyId, issuerPrivateKey);
+//  await claim.sign(restUrl, issuerPublicKeyIdTS, issuerPrivateKeyTS);
 
-  console.log('issueClaimDapi claim signatureTS', claim.signature);
+  // Sign claim with ontology-ts-sdk
+  await claimTS.sign(restUrl, issuerPublicKeyIdTS, issuerPrivateKeyTS);
+
+  console.log('issueClaimDapi claim signatureDapi', claim.signature);
+  console.log('issueClaimDapi claim signatureTS', claimTS.signature);
 
   console.log('issueClaimDapi claim signed', claim);
+  console.log('issueClaimDapi claimTS signed', claimTS);
+
+
 
 //  await retrievePublicKey(publicKeyId, url);
 
@@ -215,9 +244,11 @@ export async function issueClaimTS(claimContent, payerPrivateKeyString, issuerPr
 }
 
 export function writeClaim(issuer, subject, content) {
-  const timestamp = Date.now();
+//  const timestamp = Date.now();
+  const timestamp = 1589612511102;
   const signature = undefined;
   const useProof = true;
+//  const useProof = false;
 
   const claim = new Claim({
       messageId: issuer + timestamp,
@@ -255,6 +286,9 @@ export async function buildCommitRecordTx(claimId: string, issuer: string, subje
     console.log('buildCommitRecordTx issuer', issuer);
     console.log('buildCommitRecordTx subject', subject);
     console.log('buildCommitRecordTx claimId', str2hexstr(claimId));
+    console.log('buildCommitRecordTx gasPrice', gasPrice);
+    console.log('buildCommitRecordTx gasLimit', gasLimit);
+    console.log('buildCommitRecordTx payer', payer);
 
     const p1 = new Parameter(f.parameters[0].getName(), ParameterType.ByteArray, str2hexstr(claimId));
     const p2 = new Parameter(f.parameters[1].getName(), ParameterType.ByteArray, issuer);

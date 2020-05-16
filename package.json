@@ -8,13 +8,13 @@
   },
   "dependencies": {
     "airtable": "^0.8.1",
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^4.5.0",
     "cyanobridge": "^0.1.3",
     "ontology-dapi": "^0.4.9",
     "ontology-ts-sdk": "^1.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-router-dom": "^5.1.2",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.2.0"
   },
   "scripts": {

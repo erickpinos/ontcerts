@@ -3,7 +3,7 @@ import '../App.css';
 
 import { AirtableOntCerts } from '../utils/airtable';
 
-import { issueClaimTS, signMessage } from '../utils/ontology';
+import { issueClaimTS, issueClaimDapi, signMessage } from '../utils/ontology';
 
 import { getAccount, getIdentity } from '../utils/ontology';
 
@@ -26,8 +26,8 @@ export default class IssueCertificate extends React.Component {
 			certFinalGrade: 'Pass',
 			profiles: '',
 			submitted: '',
-			payerPrivateKey: '7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97',
-			issuerPrivateKey: '7c47df9664e7db85c1308c080f398400cb24283f5d922e76b478b5429e821b97'
+			payerPrivateKey: 'Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8',
+			issuerPrivateKey: 'Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8'
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -88,7 +88,7 @@ export default class IssueCertificate extends React.Component {
 
 		const subject = this.state.certSubject;
 
-		const result = await issueClaimTS(claim, this.state.payerPrivateKey, this.state.issuerPrivateKey, subject);
+		const result = await issueClaimDapi(claim, subject, this.state.issuerPrivateKey);
 		console.log('issueClaim result', result);
 
 		this.addClaimToAirtable(result);
@@ -144,6 +144,12 @@ export default class IssueCertificate extends React.Component {
 			<div className="row justify-content-center">
 				<div className="col-8">
 					<div>
+						<p>Step 1: Install Cyano Wallet</p>
+						<p>Step 2: Create an Asset Address through Cyano Wallet</p>
+						<p>Step 3: Get some <a href="https://developer.ont.io/">testnet ONT & ONG</a></p>
+						<p>Step 4: Create Your ONT ID address</p>
+						<p>Step 4: Export Your ONT ID Address Private Key and import it as an Asset Address</p>
+						<p>Step 5: Get some <a href="https://developer.ont.io/">testnet ONT & ONG for your new Asset Address</a></p>
 						<p>Issuing a certificate costs 0.01 testnet ONG.
 							Certificates issued through this website are issued by the testnet ONT ID did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL
 							and paid for by the testnet wallet address AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL. Certificates are issued on the Polaris testnet.</p>

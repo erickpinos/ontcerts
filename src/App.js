@@ -86,11 +86,11 @@ export default class App extends React.Component {
 					</header>
 
 					<div className="header-nav" style={{backgroundColor: '#000', marginBottom: '20px'}}>
-		        <div className="header-nav-menu">
-{/*						<div className="item"><NavLink to="/your-profile">Your Profile</NavLink></div> */}
-						<div className="item"><NavLink to="/issuers">Issuers</NavLink></div>
-{/*						<div className="item"><NavLink to="/issue-certificate">Issue Certificate</NavLink></div> */}
-						<div className="item"><NavLink to="/view-certificates">View Certificates</NavLink></div>
+	        	<div className="header-nav-menu">
+{/*							<div className="item"><NavLink to="/your-profile">Your Profile</NavLink></div> */}
+							<div className="item"><NavLink to="/issuers">Issuers</NavLink></div>
+{/*							<div className="item"><NavLink to="/issue-certificate">Issue Certificate</NavLink></div> */}
+							<div className="item"><NavLink to="/view-certificates">View Certificates</NavLink></div>
 						<div className="item"><a href="https://docs.ont.io/ontology-elements/ontid" target="_blank">Learn More About ONT ID</a></div>
 						</div>
 					</div>

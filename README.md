@@ -66,3 +66,17 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `yarn build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+### Test Addresses
+
+Address: ATD9LMdpvPabR5yRK3vpTfohYnCgnWJtJ7
+Mnemonic Phrase: father divorce glass similar hotel until trick pelican mom glare find high achieve note skull virus ring canal year clump again meat axis gas
+Private Key (WIF): KygeGQxMszKkCtuBFHq3udveV1RqMYyMGVDedUk54MRyf2UKakXo
+
+Address: ATgFze7ofxTwujGmrKQzTgdmNSGaB5UZAi
+Mnemonic Phrase: wood leisure domain pottery doll trust short speed mechanic dolphin physical century purity baby pluck phrase reflect address ranch lawn prosper such boy candy
+Private Key (WIF): L5j7zazjnH88Rnxx5QrSmSZAK4D498wWZzTnJ3AXbXEcf5ZmXJpR
+
+Address: did:ont:AQPDTnFd3r8Wn2inyCrySfKDfFoAL9ND25
+Mnemonic Phrase: venue license orbit feel measure walk chase motion salon shoot giraffe scheme upgrade pulp birth album ivory arrive pudding ecology refuse describe finish orient
+Private Key (WIF): Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8
