@@ -128,7 +128,7 @@ export async function issueClaimDapi(claimContent, subjectOntid) {
   const msgForDapi = claim.serializeUnsigned(algorithm, issuerPublicKeyId);
   console.log('issueClaimDapi msgForDapi', msgForDapi);
   const dapiSign = await signMessage(msgForDapi);
-  console.log('issueClaim dapi signed', msgForDapi);
+  console.log('issueClaimDapi dapiSign', dapiSign);
 //  claim.signature = Crypto.Signature.deserializeHex(dapiSign.data);
   let signatureDapi = Crypto.Signature.deserializeHex(dapiSign.data);
   const publicKeyStringReader = new StringReader(dapiSign.publicKey);

@@ -150,10 +150,8 @@ export default class IssueCertificate extends React.Component {
 						<p>Step 4: Create Your ONT ID address</p>
 						<p>Step 4: Export Your ONT ID Address Private Key and import it as an Asset Address</p>
 						<p>Step 5: Get some <a href="https://developer.ont.io/">testnet ONT & ONG for your new Asset Address</a></p>
-						<p>Issuing a certificate costs 0.01 testnet ONG.
-							Certificates issued through this website are issued by the testnet ONT ID did:ont:AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL
-							and paid for by the testnet wallet address AeXrnQ7jvo3HbSPgiThkgJ7ifPQkzXhtpL. Certificates are issued on the Polaris testnet.</p>
-							<p>Please paste the private key of the payer address and the issuing ONT ID address.</p>
+						<p>Step 6: Make sure your asset address and ONT ID address are set to the same. Issue a certificate below</p>
+						<p>Issuing a certificate costs 0.01 testnet ONG.</p>
 					</div>
 				</div>
 			</div>
@@ -161,7 +159,7 @@ export default class IssueCertificate extends React.Component {
 			{ (this.state.submitted === '') && (
 
 			<form onSubmit={this.handleSubmit}>
-
+{/*
 			<div className="form-group">
 				<div className="form-group">
 					<label>Payer Private Key:</label>
@@ -176,6 +174,7 @@ export default class IssueCertificate extends React.Component {
 						<textarea name="issuerPrivateKey" value={this.state.issuerPrivateKey} onChange={this.handleChange} required/>
 					</div>
 				</div>
+*/}
 {/*
 				<div className="form-group">
 					<label>Institution Name:</label>
