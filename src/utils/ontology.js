@@ -95,20 +95,11 @@ function convertValue(value: string, type: ParameterType) {
 }
 
 
-export async function issueClaimDapi(claimContent, subjectOntid, issuerPrivateKeyString) {
+export async function issueClaimDapi(claimContent, subjectOntid) {
 
-  console.log('issueClaimDapi issuerPrivateKeyString', issuerPrivateKeyString);
-  const issuerPrivateKeyTS = Crypto.PrivateKey.deserializeWIF('Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8');
-  console.log('issueClaimDapi issuerPrivateKeyTS', issuerPrivateKeyTS);
-
-  const issuerPublicKeyTS = issuerPrivateKeyTS.getPublicKey();
-  console.log('issueClaimDapi issuerPublicKeyTS', issuerPublicKeyTS);
-
-  const issuerOntidTS = Crypto.Address.generateOntid(issuerPublicKeyTS);
-  console.log('issueClaimDapi issuerOntidTS', issuerOntidTS);
-
-  const issuerPublicKeyIdTS = issuerOntidTS + '#keys-1';
-  console.log('issueClaimDapi issuerPublicKeyIdTS', issuerPublicKeyIdTS);
+  // Admin Key
+  const adminPrivateKey = Crypto.PrivateKey.deserializeWIF('Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8');
+  console.log('issueClaimDapi adminPrivateKey', adminPrivateKey);
 
   const issuerAccount = await getAccount();
   console.log('issueClaimDapi issuerAccount', issuerAccount);
@@ -116,23 +107,25 @@ export async function issueClaimDapi(claimContent, subjectOntid, issuerPrivateKe
   const issuerPublicKey = await getPublicKey();
   console.log('issueClaimDapi issuerPublicKey', issuerPublicKey);
 
-  const issuerOntid = await getIdentity();
+//  const issuerOntid = await getIdentity();
+  const issuerOntid = 'did:ont:' + issuerAccount;
+//  console.log('issueClaimDapi issuerOntid2', issuerOntid2);
   console.log('issueClaimDapi issuerOntid', issuerOntid);
 
   const issuerPublicKeyId = issuerOntid + '#keys-1';
   console.log('issueClaimDapi issuerPublicKeyId', issuerPublicKeyId);
 
   let claim = await writeClaim(issuerOntid, subjectOntid, claimContent);
-  let claimTS = await writeClaim(issuerOntid, subjectOntid, claimContent);
+//  let claimTS = await writeClaim(issuerOntid, subjectOntid, claimContent);
 
   console.log('issueClaimDapi claim unsigned', claim);
-  console.log('issueClaimDapi claimTS unsigned', claimTS);
+//  console.log('issueClaimDapi claimTS unsigned', claimTS);
 
-  const algorithmTS = issuerPrivateKeyTS.algorithm.defaultSchema;
-  console.log('issuerClaimDapi algorithmTS', algorithmTS);
+  const algorithm = adminPrivateKey.algorithm.defaultSchema;
+  console.log('issuerClaimDapi algorithm', algorithm);
 
   // Sign claim with ontology-dapi
-  const msgForDapi = claim.serializeUnsigned(algorithmTS, issuerPublicKeyId);
+  const msgForDapi = claim.serializeUnsigned(algorithm, issuerPublicKeyId);
   console.log('issueClaimDapi msgForDapi', msgForDapi);
   const dapiSign = await signMessage(msgForDapi);
   console.log('issueClaim dapi signed', msgForDapi);
@@ -148,15 +141,13 @@ export async function issueClaimDapi(claimContent, subjectOntid, issuerPrivateKe
 //  await claim.sign(restUrl, issuerPublicKeyIdTS, issuerPrivateKeyTS);
 
   // Sign claim with ontology-ts-sdk
-  await claimTS.sign(restUrl, issuerPublicKeyIdTS, issuerPrivateKeyTS);
+//  await claimTS.sign(restUrl, issuerPublicKeyIdTS, issuerPrivateKeyTS);
 
   console.log('issueClaimDapi claim signatureDapi', claim.signature);
-  console.log('issueClaimDapi claim signatureTS', claimTS.signature);
+//  console.log('issueClaimDapi claim signatureTS', claimTS.signature);
 
   console.log('issueClaimDapi claim signed', claim);
-  console.log('issueClaimDapi claimTS signed', claimTS);
-
-
+//  console.log('issueClaimDapi claimTS signed', claimTS);
 
 //  await retrievePublicKey(publicKeyId, url);
 
@@ -244,14 +235,14 @@ export async function issueClaimTS(claimContent, payerPrivateKeyString, issuerPr
 }
 
 export function writeClaim(issuer, subject, content) {
-//  const timestamp = Date.now();
-  const timestamp = 1589612511102;
+  const timestamp = Date.now();
+//  const timestamp = 1589612511102;
   const signature = undefined;
   const useProof = true;
 //  const useProof = false;
 
   const claim = new Claim({
-      messageId: issuer + timestamp,
+      messageId: issuer + '@' + timestamp,
       issuer: issuer,
       subject: subject,
       issuedAt: timestamp

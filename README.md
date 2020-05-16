@@ -80,3 +80,7 @@ Private Key (WIF): L5j7zazjnH88Rnxx5QrSmSZAK4D498wWZzTnJ3AXbXEcf5ZmXJpR
 Address: did:ont:AQPDTnFd3r8Wn2inyCrySfKDfFoAL9ND25
 Mnemonic Phrase: venue license orbit feel measure walk chase motion salon shoot giraffe scheme upgrade pulp birth album ivory arrive pudding ecology refuse describe finish orient
 Private Key (WIF): Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8
+
+Address: did:ont:AdSso6LKKJQ2U7jBY9Rne74HcE7cmvSVTZ
+Mnemonic Phrase: kitten split comic husband puzzle element rival judge today dose crazy setup another rate master wire tooth fox eye clever grant gas fiscal win
+Private Key (WIF): L12FUynP9nFokdc7rNPDVv1aqz443LbQwpH9R86CLa67ESG5wtBc
