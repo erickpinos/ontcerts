@@ -159,8 +159,9 @@ export default class IssueCertificate extends React.Component {
 			{ (this.state.submitted === '') && (
 
 			<form onSubmit={this.handleSubmit}>
-{/*
+
 			<div className="form-group">
+{/*
 				<div className="form-group">
 					<label>Payer Private Key:</label>
 					<div>
