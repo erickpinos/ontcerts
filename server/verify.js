@@ -1,33 +1,27 @@
-import { Crypto, AbiInfo, Parameter, ParameterType, TransactionBuilder, Claim, RestClient, DDO, OntidContract } from 'ontology-ts-sdk';
-import { reverseHex, str2hexstr, hexstr2str, StringReader } from '../utils/utils';
+const { Crypto, AbiInfo, Parameter, ParameterType, TransactionBuilder, Claim, RestClient, DDO, OntidContract } = require('ontology-ts-sdk');
+const { reverseHex, str2hexstr, hexstr2str, StringReader } = require('./utils');
 
 // ONT ID Contract Info
-import abiJson from '../data/attestClaim';
-const abiInfo = AbiInfo.parseJson(JSON.stringify(abiJson));
+// TODO: pull abiJson directly from attestCLaim.js
+const abiJson = require('./data/attestClaim');
+console.log('abiJson = ', abiJson);
+console.log('abiJson.attestClaim = ', abiJson.attestClaim);
+console.log('JSON.stringify(abiJson.attestClaim)', JSON.stringify(abiJson.attestClaim));
+const abiInfo = AbiInfo.parseJson(JSON.stringify(abiJson.attestClaim));
+console.log('abiInfo', abiInfo);
+console.log('abiInfo.getHash', abiInfo.getHash());
 const contractHash = abiInfo.getHash().replace('0x', '');
 const contractAddress = new Crypto.Address(reverseHex(contractHash));
 
 // ONT Node URL Info
 const restUrl = 'http://polaris1.ont.io:20334';
 
-const axios = require('axios').default;
+async function verify(claimSerialized) {
 
-export async function verify(claimSerialized) {
+  console.log('verify claimSerialized', claimSerialized);
 
-  const data = {
-    claimSerialized
-  }
+  const claim = Claim.deserialize(claimSerialized);
 
-  var result = '';
-
-  let res = await axios.post("/verify", data);
-
-  console.log('axios res', res);
-  console.log('axios /verify res.data', res.data);
-  result = res.data;
-
-  return result;
-/*
   console.log('verify claim', claim);
 
   const resultVerifySignatureAndAttestStatus = await claim.verify(restUrl, true);
@@ -42,56 +36,38 @@ export async function verify(claimSerialized) {
   const resultVerifyGetStatusCustom = await getStatus(claim, restUrl);
   console.log('verify resultVerifyGetStatusCustom', resultVerifyGetStatusCustom);
 
-  const resultVerifyExpiration = await verifyExpiration(claim);
+  const resultVerifyExpiration = await verifyExpiration(claimSerialized);
   console.log('verify resultVerifyExpiration', resultVerifyExpiration);
 
-  const resultVerifyKeyOwnership = await verifyKeyOwnership(claim);
+  const resultVerifyKeyOwnership = await verifyKeyOwnership(claimSerialized);
   console.log('verify resultVerifyKeyOwnership', resultVerifyKeyOwnership);
 
-  const resultVerifyNotRevoked = await verifyNotRevoked(claim);
+  const resultVerifyNotRevoked = await verifyNotRevoked(claimSerialized);
   console.log('verify resultVerifyNotRevoked', resultVerifyNotRevoked);
 
-  const resultVerifyMatchingClaimId = await verifyMatchingClaimId(claim);
+  const resultVerifyMatchingClaimId = await verifyMatchingClaimId(claimSerialized);
   console.log('verify resultVerifyMatchingClaimId', resultVerifyMatchingClaimId);
 
-  const resultVerifyAttestStatus = await verifyAttestStatus(claim);
+  const resultVerifyAttestStatus = await verifyAttestStatus(claimSerialized);
   console.log('verify resultVerifyAttestStatus', resultVerifyAttestStatus);
 
-*/
-//  return resultVerifySignatureAndAttestStatus;
+  return resultVerifySignatureAndAttestStatus;
 }
 
-export async function verifyExpiration(claimSerialized) {
-//  console.log('verifyExpiration', claim.verifyExpiration());
-//  return claim.verifyExpiration();
-
-  const data = {
-    claimSerialized
-  }
-
-  console.log('verifyExpiration data', data)
-  let res = await axios.post("/verify/verifyExpiration", data);
-  console.log('verifyExpiration res', res);
-  const result = res.data;
-  return result;
+async function verifyExpiration(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('verifyExpiration', claim.verifyExpiration());
+  return claim.verifyExpiration();
 }
 
-export async function verifyKeyOwnership(claimSerialized) {
-//  console.log('verifyKeyOwnership', claim.verifyKeyOwnership());
-//  return claim.verifyKeyOwnership();
-
-const data = {
-  claimSerialized
+async function verifyKeyOwnership(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('verifyKeyOwnership', claim.verifyKeyOwnership());
+  return claim.verifyKeyOwnership();
 }
 
-let res = await axios.post("/verify/verifyKeyOwnership", data);
-const result = res.data;
-return result;
-
-}
-
-export async function verifyNotRevoked(claimSerialized) {
-/*
+async function verifyNotRevoked(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
   const signature = claim.signature;
 
   const state = await retrievePublicKeyState(signature.publicKeyId, restUrl);
@@ -103,20 +79,10 @@ export async function verifyNotRevoked(claimSerialized) {
     console.log('verifyRevoked', true);
     return true
   }
-*/
-
-const data = {
-  claimSerialized
 }
 
-let res = await axios.post("/verify/verifyExpiration", data);
-const result = res.data;
-return result;
-
-}
-
-export async function verifySignature(claimSerialized) {
-/*
+async function verifySignature(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
   const signature = claim.signature;
 
   const publicKey = await retrievePublicKey(signature.publicKeyId, restUrl);
@@ -125,19 +91,10 @@ export async function verifySignature(claimSerialized) {
 //  console.log('testSignature publicKey', publicKey);
 //  console.log('testSignature publicKey.verify', publicKey.verify(msgHex, signature));
   return publicKey.verify(msgHex, signature);
-*/
-const data = {
-  claimSerialized
 }
 
-let res = await axios.post("/verify/verifySignature", data);
-const result = res.data;
-return result;
-
-}
-
-export async function verifyMatchingClaimId(claimSerialized) {
-/*
+async function verifyMatchingClaimId(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
   const attesterId = claim.metadata.issuer;
   const claimId = claim.metadata.messageId;
   if (claimId === undefined) {
@@ -156,19 +113,10 @@ export async function verifyMatchingClaimId(claimSerialized) {
 //  console.log('testBlockchain getStatus custom result', result);
 //  console.log('testBlockchain getStatus testing is issuerId matches this attesterid', result.issuerId === attesterId);
   return result.issuerId === attesterId;
-*/
-const data = {
-  claimSerialized
 }
 
-let res = await axios.post("/verify/verifyMatchingClaimId", data);
-const result = res.data;
-return result;
-
-}
-
-export async function verifyAttestStatus(claimSerialized) {
-/*
+async function verifyAttestStatus(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
   const attesterId = claim.metadata.issuer;
   const claimId = claim.metadata.messageId;
   if (claimId === undefined) {
@@ -186,15 +134,6 @@ export async function verifyAttestStatus(claimSerialized) {
 
 //  console.log('testBlockchain getStatus custom result', result);
   return result.status === '01';
-*/
-const data = {
-  claimSerialized
-}
-
-let res = await axios.post("/verify/verifyAttestStatus", data);
-const result = res.data;
-return result;
-
 }
 
 /**
@@ -202,7 +141,8 @@ return result;
  *
  * @param url Restful endpoint of Ontology node
  */
-async function getStatus(claim, url: string) {
+//async function getStatus(claim, url: string) {
+async function getStatus(claim, url) {
     const attesterId = claim.metadata.issuer;
     const claimId = claim.metadata.messageId;
     if (claimId === undefined) {
@@ -232,7 +172,9 @@ async function getStatus(claim, url: string) {
  * @param publicKeyId The ID of a signature public key
  * @param url Restful endpoint of Ontology node
  */
-export async function retrievePublicKey(publicKeyId: string, url: string) {
+//async function retrievePublicKey(publicKeyId: string, url: string) {
+async function retrievePublicKey(publicKeyId, url) {
+
     const ontId = extractOntId(publicKeyId);
     const keyId = extractKeyId(publicKeyId);
 
@@ -261,7 +203,8 @@ export async function retrievePublicKey(publicKeyId: string, url: string) {
  * @param publicKeyId The ID of a signature public key
  * @param url Restful endpoint of Ontology node
  */
-export async function retrievePublicKeyState(publicKeyId: string, url: string) {
+//async function retrievePublicKeyState(publicKeyId: string, url: string) {
+async function retrievePublicKeyState(publicKeyId, url) {
     const ontId = extractOntId(publicKeyId);
     const keyId = extractKeyId(publicKeyId);
 
@@ -280,7 +223,8 @@ export async function retrievePublicKeyState(publicKeyId: string, url: string) {
  *
  * @param publicKeyId The ID of a signature public key
  */
-export function extractOntId(publicKeyId: string): string {
+//function extractOntId(publicKeyId: string): string {
+function extractOntId(publicKeyId) {
     const index = publicKeyId.indexOf('#keys-');
 
     if (index === -1) {
@@ -295,7 +239,8 @@ export function extractOntId(publicKeyId: string): string {
  *
  * @param publicKeyId The ID of a signature public key
  */
-export function extractKeyId(publicKeyId: string): number {
+//function extractKeyId(publicKeyId: string): number {
+function extractKeyId(publicKeyId) {
     const index = publicKeyId.indexOf('#keys-');
 
     if (index === -1) {
@@ -313,7 +258,8 @@ export function extractKeyId(publicKeyId: string): number {
  *
  * @param claimId Unique id of the claim
  */
-export function buildGetRecordStatusTx(claimId: string) {
+//function buildGetRecordStatusTx(claimId: string) {
+function buildGetRecordStatusTx(claimId) {
     const f = abiInfo.getFunction('GetStatus');
     const p1 = new Parameter(f.parameters[0].getName(), ParameterType.ByteArray, str2hexstr(claimId));
     const tx = TransactionBuilder.makeInvokeTransaction(f.name, [p1], contractAddress);
@@ -324,8 +270,16 @@ export function buildGetRecordStatusTx(claimId: string) {
  * Helper class for deserializing GetStatus response.
  * fixme: Ontology node changed the response
  */
-export class GetStatusResponse {
-    static deserialize(r: any): GetStatusResponse {
+class GetStatusResponse {
+
+  constructor() {
+    var claimId = '';
+    var issuerId = '';
+    var subjectId = '';
+    var status = '';
+  }
+//    static deserialize(r: any): GetStatusResponse {
+    static deserialize(r) {
         const response = new GetStatusResponse();
 
         if (r.Result !== undefined && r.Result.Result === '') {
@@ -354,10 +308,7 @@ export class GetStatusResponse {
         return response;
     }
 
-    claimId: string;
-    issuerId: string;
-    subjectId: string;
-    status: Status;
+
     // status: Status;
     // attesterId: string;
     // time: string;
@@ -371,3 +322,17 @@ export enum Status {
 }
 
 */
+
+module.exports.verify = verify;
+module.exports.verifyExpiration = verifyExpiration;
+module.exports.verifyKeyOwnership = verifyKeyOwnership;
+module.exports.verifyNotRevoked = verifyNotRevoked;
+module.exports.verifySignature = verifySignature;
+module.exports.verifyMatchingClaimId = verifyMatchingClaimId;
+module.exports.verifyAttestStatus = verifyAttestStatus;
+module.exports.retrievePublicKey = retrievePublicKey;
+module.exports.retrievePublicKeyState = retrievePublicKeyState;
+module.exports.extractOntId = extractOntId;
+module.exports.extractKeyId = extractKeyId;
+module.exports.buildGetRecordStatusTx = buildGetRecordStatusTx;
+module.exports.GetStatusResponse = GetStatusResponse;

@@ -17,6 +17,7 @@ export default class Certificate extends React.Component {
 		this.state = {
 			'account': '',
 			'identity': '',
+			'claimSerialized': this.props.certificate.claimSerialized,
 			'claim': this.props.certificate.certificate,
 			'certificateType': this.props.certificate.type,
 			'verify': '',
@@ -53,20 +54,19 @@ export default class Certificate extends React.Component {
 	    verify: 'testing',
 	  });
 
-		const verifyResult = await verify(this.state.claim, this.state.claim.metadata.issuer);
+		const verifyResult = await verify(this.state.claimSerialized, this.state.claim.metadata.issuer);
 		if (verifyResult === true) {
 	    this.setState({verify: 'passed'});
 		} else {
 	    this.setState({verify: 'failed'});
 	  }
 
-		const verifyExpirationTest = await verifyExpiration(this.state.claim);
-		this.setState({verifyExpiration: JSON.stringify(verifyExpirationTest)});
-		this.setState({verifyKeyOwnership: JSON.stringify(await verifyKeyOwnership(this.state.claim))});
-		this.setState({verifyNotRevoked: JSON.stringify(await verifyNotRevoked(this.state.claim))});
-		this.setState({verifySignature: JSON.stringify(await verifySignature(this.state.claim))});
-		this.setState({verifyMatchingClaimId: JSON.stringify(await verifyMatchingClaimId(this.state.claim))});
-		this.setState({verifyAttestStatus: JSON.stringify(await verifyAttestStatus(this.state.claim))});
+		this.setState({verifyExpiration: JSON.stringify(await verifyExpiration(this.state.claimSerialized))});
+		this.setState({verifyKeyOwnership: JSON.stringify(await verifyKeyOwnership(this.state.claimSerialized))});
+		this.setState({verifyNotRevoked: JSON.stringify(await verifyNotRevoked(this.state.claimSerialized))});
+		this.setState({verifySignature: JSON.stringify(await verifySignature(this.state.claimSerialized))});
+		this.setState({verifyMatchingClaimId: JSON.stringify(await verifyMatchingClaimId(this.state.claimSerialized))});
+		this.setState({verifyAttestStatus: JSON.stringify(await verifyAttestStatus(this.state.claimSerialized))});
 	}
 
   render() {

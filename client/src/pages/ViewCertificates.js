@@ -43,7 +43,7 @@ export default class ViewCertificates extends React.Component {
 				console.log('getAirtableClaims claim.metadata.subject', claim.metadata.subject);
 
 				if (claim.metadata.subject === this.state.identity || claim.metadata.issuer === this.state.identity) {
-					claims.push({'type': 'Online', 'certificate': claim});
+					claims.push({'type': 'Online', 'certificate': claim, 'claimSerialized': claimSerialized});
 				}
 			}
 

@@ -16,6 +16,9 @@ const PORT = process.env.PORT || 5000;
 const restUrl = 'http://polaris1.ont.io:20334';
 const socketUrl = 'ws://polaris1.ont.io:20335';
 
+const { verify, verifyExpiration, verifyKeyOwnership, verifyNotRevoked,
+	verifySignature, verifyMatchingClaimId, verifyAttestStatus } = require('./verify');
+
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
   console.error(`Node cluster master ${process.pid} is running`);
@@ -59,12 +62,49 @@ if (!isDev && cluster.isMaster) {
   const contractAddress = req.body.contractAddress;
 
   const proof = await ontologyTsSdk.Merkle.constructMerkleProof(restUrl, dapiAttestResultTransaction, contractAddress);
-  console.log('express proof', proof);
+//  console.log('express proof', proof);
 //  res.set('Content-Type', 'application/json');
 
   res.send(proof);
 //  res.send('{"message": "test from the custom server!"}');
 
+  });
+
+  app.post('/verify', async function (req, res) {
+    const result = await verify(req.body.claimSerialized);
+    res.send(result);
+  });
+
+  app.post('/verify/verifyExpiration', async function (req, res) {
+    console.log('/verify/verifyExpiration');
+    const result = await verifyExpiration(req.body.claimSerialized);
+    console.log('/verify/verifyExpiration result', result);
+    res.send(result);
+  });
+
+  app.post('/verify/verifyKeyOwnership', async function (req, res) {
+    const result = await verifyKeyOwnership(req.body.claimSerialized);
+    res.send(result);
+  });
+
+  app.post('/verify/verifyNotRevoked', async function (req, res) {
+    const result = await verifyNotRevoked(req.body.claimSerialized);
+    res.send(result);
+  });
+
+  app.post('/verify/verifySignature', async function (req, res) {
+    const result = await verifySignature(req.body.claimSerialized);
+    res.send(result);
+  });
+
+  app.post('/verify/verifyMatchingClaimId', async function (req, res) {
+    const result = await verifyMatchingClaimId(req.body.claimSerialized);
+    res.send(result);
+  });
+
+  app.post('/verify/verifyAttestStatus', async function (req, res) {
+    const result = await verifyAttestStatus(req.body.claimSerialized);
+    res.send(result);
   });
 
   app.use(express.static(path.resolve(__dirname, '../client/public')));

@@ -209,7 +209,9 @@ export async function issueClaimDapi(claimContent, subjectOntid) {
 
   console.log('issueClaim msg deserialized claimtomatch', msg);
 
-  const verifyResult = await verify(msg);
+//  const verifyResult = await verify(msg);
+  const verifyResult = await verify(signed);
+
   console.log('issueClaim verifyResult', verifyResult);
 
   return signed;
