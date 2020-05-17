@@ -43,26 +43,14 @@ export default class Issuers extends React.Component {
 
       <div className="row">
         <div className="col">
-          <table style={{margin: '0 auto'}}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-								<th>Account</th>
-								<th>Image</th>
-	            </tr>
-            </thead>
-            <tbody>
 							{profiles.map(profile => (
-								<tr>
-									<td>{profile.fields.name}</td>
-									<td>{profile.fields.email}</td>
-									<td>{profile.fields.account}</td>
-									<td><img src={profile.fields.image[0].url} alt="profile" width="100px"/></td>
-						    </tr>
+								<div class="card">
+									<div class="card-text">Name: {profile.fields.name}</div>
+									<div>Email: {profile.fields.email}</div>
+									<div>Account: {profile.fields.account}</div>
+									<div>Logo: <img src={profile.fields.image[0].url} alt="profile" width="100px"/></div>
+						    </div>
               ))}
-            </tbody>
-          </table>
         </div>
       </div>
 			</div>
