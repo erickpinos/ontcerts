@@ -14,6 +14,8 @@ const abiInfo = AbiInfo.parseJson(JSON.stringify(abiJson));
 const contractHash = abiInfo.getHash().replace('0x', '');
 const contractAddress = new Crypto.Address(reverseHex(contractHash));
 
+const axios = require('axios').default;
+
 // ONT Node URL Info
 const restUrl = 'http://polaris1.ont.io:20334';
 const socketUrl = 'ws://polaris1.ont.io:20335';
@@ -170,7 +172,32 @@ export async function issueClaimDapi(claimContent, subjectOntid) {
 
   const contract = '36bb5c053b6b839c8f6b923fe852f91239b9fccc';
 // proof for ts-sdk
-  const proof = await Merkle.constructMerkleProof(restUrl, dapiAttestResult.transaction, contractAddress);
+//  const proof = await Merkle.constructMerkleProof(restUrl, dapiAttestResult.transaction, contractAddress);
+
+  var proof = '';
+
+  const data = {
+    dapiAttestResultTransaction: dapiAttestResult.transaction,
+    contractAddress: contractAddress
+  }
+
+  const test = 'test';
+  const test2 = 'test2';
+
+  const data2 = {
+    test,
+    test2
+  }
+
+  console.log('issueClaim axios');
+
+  axios.post("/proof", data, { // receive two parameter endpoint url ,form data
+     })
+     .then(res => { // then print response status
+       console.log('axios res', res);
+       console.log('axios res.data', res.data);
+       proof = res.data;
+     })
 
   claim.proof = proof;
   console.log('issueClaim claim with proof clamtomatch', claim);
