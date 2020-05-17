@@ -3,7 +3,7 @@ import '../App.css';
 
 import { AirtableOntCerts } from '../utils/airtable';
 
-import { issueClaimTS, issueClaimDapi, signMessage } from '../utils/ontology';
+import { issueClaimTS, issueClaimDapi, signMessage, getTxHash } from '../utils/ontology';
 
 import { getAccount, getIdentity } from '../utils/ontology';
 
@@ -27,7 +27,9 @@ export default class IssueCertificate extends React.Component {
 			profiles: '',
 			submitted: '',
 			payerPrivateKey: 'Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8',
-			issuerPrivateKey: 'Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8'
+			issuerPrivateKey: 'Kx6uDnwAdhKdcaTPi81Rac1MzpD4QbKTJxt7xSVCmXuEjoHtPeS8',
+			txLink: '',
+			txHash: ''
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -91,9 +93,18 @@ export default class IssueCertificate extends React.Component {
 		const result = await issueClaimDapi(claim, subject, this.state.issuerPrivateKey);
 		console.log('issueClaim result', result);
 
-		this.addClaimToAirtable(result);
 
-		this.setState({serializedJSON: result});
+		const txHash = result[1];
+
+
+		this.setState({
+			txHash: txHash,
+			txLink: 'https://explorer.ont.io/transaction/' + txHash + '/testnet'
+		});
+
+		this.addClaimToAirtable(result[0]);
+
+		this.setState({serializedJSON: result[0]});
 		this.setState({submitted: 'done'});
 	}
 
@@ -220,7 +231,9 @@ export default class IssueCertificate extends React.Component {
 
 	{ (this.state.submitted === 'done') && (
 		<div className="row justify-content-center">
-			<p>Submitted. View & verify your certificate in the 'View Certificates' tab.</p>
+			<div>Submitted. View & verify your certificate in the 'View Certificates' tab.</div>
+			<div><a href={this.state.txLink} target="blank">View Transaction on the Ontology Block Explorer</a></div>
+			<div>Tx Hash: {this.state.txHash}</div>
 		</div>
 	)
 }

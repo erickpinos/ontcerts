@@ -191,7 +191,7 @@ export async function issueClaimDapi(claimContent, subjectOntid) {
 
   console.log('issueClaim axios');
 
-  axios.post("/proof", data, { // receive two parameter endpoint url ,form data
+  await axios.post("/proof", data, { // receive two parameter endpoint url ,form data
      })
      .then(res => { // then print response status
        console.log('axios res', res);
@@ -214,7 +214,21 @@ export async function issueClaimDapi(claimContent, subjectOntid) {
 
   console.log('issueClaim verifyResult', verifyResult);
 
-  return signed;
+  return [signed, dapiAttestResult.transaction];
+}
+
+export async function getBlockHeight(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('getBlockHeight claim', claim);
+  console.log('getBlockHeight', claim.proof.BlockHeight);
+  return claim.proof.BlockHeight;
+}
+
+export async function getTxHash(claimSerialized) {
+  const claim = Claim.deserialize(claimSerialized);
+  console.log('getTxnHash claim', claim);
+  console.log('getTxnHash', claim.proof.TxnHash);
+  return claim.proof.TxnHash;
 }
 
 export async function issueClaimTS(claimContent, payerPrivateKeyString, issuerPrivateKeyString, subjectOntid) {
