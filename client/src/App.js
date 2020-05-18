@@ -9,6 +9,7 @@ import YourProfile from './pages/YourProfile';
 import Issuers from './pages/Issuers';
 import ViewCertificates from './pages/ViewCertificates';
 import IssueCertificate from './pages/IssueCertificate';
+import GettingStarted from './pages/GettingStarted';
 
 import { getAccount, getIdentity } from './utils/ontology';
 
@@ -88,6 +89,7 @@ export default class App extends React.Component {
 					<div className="header-nav" style={{backgroundColor: '#000', marginBottom: '20px'}}>
 	        	<div className="header-nav-menu">
 {/*							<div className="item"><NavLink to="/your-profile">Your Profile</NavLink></div> */}
+							<div className="item"><NavLink to="/getting-started">Getting Started</NavLink></div>
 							<div className="item"><NavLink to="/issuers">Issuers</NavLink></div>
 							<div className="item"><NavLink to="/issue-certificate">Issue Certificate</NavLink></div>
 							<div className="item"><NavLink to="/view-certificates">View Certificates</NavLink></div>
@@ -98,6 +100,7 @@ export default class App extends React.Component {
 					<div className="content container">
 						<Switch>
 							<Route exact path="/"/>
+							<Route path="/getting-started" component={GettingStarted}/>
 							<Route path="/your-profile" component={YourProfile}/>
 							<Route path="/issuers" component={Issuers}/>
 							<Route path="/issue-certificate" component={IssueCertificate}/>

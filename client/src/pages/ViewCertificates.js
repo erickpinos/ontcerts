@@ -32,6 +32,7 @@ export default class ViewCertificates extends React.Component {
 
 			for (let i = 0; i < data.records.length; i++) {
 				var claimSerialized = data.records[i].fields['claim'];
+				var txLink = data.records[i].fields['txLink'];
 				console.log('getAirtableClaims claimSerialized', claimSerialized);
 
 				const claim = Claim.deserialize(claimSerialized);
@@ -43,7 +44,7 @@ export default class ViewCertificates extends React.Component {
 				console.log('getAirtableClaims claim.metadata.subject', claim.metadata.subject);
 
 				// Show all claims for now
-				claims.push({'type': 'Online', 'certificate': claim, 'claimSerialized': claimSerialized});
+				claims.push({'type': 'Online', 'certificate': claim, 'claimSerialized': claimSerialized, 'txLink': txLink});
 
 /*
 				if (claim.metadata.subject === this.state.identity || claim.metadata.issuer === this.state.identity) {

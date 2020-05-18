@@ -41,7 +41,8 @@ export default class Certificate extends React.Component {
 			'verifyNotRevoked': '',
 			'verifySignature': '',
 			'verifyMatchingClaimId': '',
-			'verifyAttestStatus': ''
+			'verifyAttestStatus': '',
+			'txLink': this.props.certificate.txLink
     };
 		this.verifyClaim = this.verifyClaim.bind(this);
    this.handleSelect = this.handleSelect.bind(this);
@@ -300,7 +301,7 @@ export default class Certificate extends React.Component {
 							<div class="row justify-content-center no-gutters">
 
 								<div class="col-3 justify-content-center">
-									<img src={degreeIcon} class="card-img p-3" />
+									<img src={degreeIcon} class="card-img p-md-3" />
 								</div>
 
 								<div class="col-md-9">
@@ -368,7 +369,11 @@ export default class Certificate extends React.Component {
 					</div>
 
 				</Tab.Container>
-
+				<div class="card-footer text-muted">
+					{this.state.txLink && (
+			    	<a href={this.state.txLink} target="_blank">View on ONT Block Explorer</a>
+					)}
+				</div>
 			</div>
 		</div>
 	</div>

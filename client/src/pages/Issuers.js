@@ -53,6 +53,7 @@ export default class Issuers extends React.Component {
               ))}
         </div>
       </div>
+			<h6><i>Interested in becoming a verified issuer? Ask in the #development channel of the <a href="https://discord.com/invite/4TQujHj" target="_blank">Ontology Discord</a>.</i></h6>
 			</div>
 		);
 }
