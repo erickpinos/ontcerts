@@ -99,7 +99,7 @@ export default class App extends React.Component {
 
 					<div className="content container">
 						<Switch>
-							<Route exact path="/"/>
+							<Route exact path="/" component={ViewCertificates}/>
 							<Route path="/getting-started" component={GettingStarted}/>
 							<Route path="/your-profile" component={YourProfile}/>
 							<Route path="/issuers" component={Issuers}/>

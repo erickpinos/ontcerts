@@ -122,7 +122,8 @@ export default class GettingStarted extends React.Component {
 						<img src={gettingStarted19} width="100%"/>
 						<div class="p-4"></div>
 
-						<h5>Step 20: You are now ready to <a href="/issue-certificate">issue an ONT certificat here.</a></h5>
+						<h5>Step 20: You are now ready to <a href="/issue-certificate">issue an ONT certificate here.</a></h5>
+						<div class="p-4"></div>
 
 	        </div>
 	      </div>

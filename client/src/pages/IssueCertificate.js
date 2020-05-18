@@ -167,9 +167,8 @@ export default class IssueCertificate extends React.Component {
 				<div className="col-md-8">
 					<div>
 						<p>Read the <a href="/getting-started">Getting Started</a> guide to get set up to issue certificates on the Ontology blockchain.</p>
-						<p>Issuing aN ONT ID certificate costs 0.01 ONG.</p>
+						<p>Issuing an ONT ID certificate costs 0.01 ONG.</p>
 						<p>Certificates issued through this website are public and stored on the cloud.</p>
-						<p><i>Coming soon: ONT ID deep dives and video tutorials.</i></p>
 {/*						<p>Step 1: <a href="https://chrome.google.com/webstore/detail/cyano-wallet/dkdedlpgdmmkkfjabffeganieamfklkm" target="_blank">Install Cyano Wallet</a></p>
 						<p>Step 2: Create an asset address through Cyano Wallet.</p>
 						<p>Step 3: Get some <a href="https://developer.ont.io/">testnet ONT & ONG</a> from this faucet.</p>

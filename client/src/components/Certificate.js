@@ -75,15 +75,21 @@ export default class Certificate extends React.Component {
 	async verifyClaim() {
 		this.setState({
 	    verify: 'testing',
-			'progress': 5,
-			'progressVariant': 'success',
-			'progressAnimation': true,
+			progress: 5,
+			progressVariant: 'success',
+			progressAnimation: true,
 			v1: 'font-weight-bold',
 			v2: '',
 			v3: '',
 			v4: '',
 			v5: '',
-			v6: ''
+			v6: '',
+			verifyExpiration: '',
+			verifyKeyOwnership: '',
+			verifyNotRevoked: '',
+			verifySignature: '',
+			verifyMatchingClaimId: '',
+			verifyAttestStatus: ''
 	  });
 
 		const verifyExpirationResult = await verifyExpiration(this.state.claimSerialized)
