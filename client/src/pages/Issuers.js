@@ -44,11 +44,11 @@ export default class Issuers extends React.Component {
       <div className="row">
         <div className="col">
 							{profiles.map(profile => (
-								<div class="card">
+								<div class="card m-4">
 									<div class="card-text">Name: {profile.fields.name}</div>
 									<div>Email: {profile.fields.email}</div>
 									<div>Account: {profile.fields.account}</div>
-									<div>Logo: <img src={profile.fields.image[0].url} alt="profile" width="100px"/></div>
+									<div>Logo: <img src={profile.fields.image[0].url} alt="profile" width="250px"/></div>
 						    </div>
               ))}
         </div>

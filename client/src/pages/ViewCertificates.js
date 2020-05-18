@@ -42,9 +42,14 @@ export default class ViewCertificates extends React.Component {
 				console.log('getAirtableClaims claim.metadata.issuer', claim.metadata.issuer);
 				console.log('getAirtableClaims claim.metadata.subject', claim.metadata.subject);
 
+				// Show all claims for now
+				claims.push({'type': 'Online', 'certificate': claim, 'claimSerialized': claimSerialized});
+
+/*
 				if (claim.metadata.subject === this.state.identity || claim.metadata.issuer === this.state.identity) {
 					claims.push({'type': 'Online', 'certificate': claim, 'claimSerialized': claimSerialized});
 				}
+*/
 			}
 
 			console.log('getAirtableClaims claims', claims);
@@ -70,8 +75,6 @@ export default class ViewCertificates extends React.Component {
 				<div className="row">
 					<div className="col">
 			      <h3>View Certificates</h3>
-						<p>ONTcerts v1. This type of certificate is an ONT ID claim issued by a custodian ONT ID address.
-						The recipient of this particular type of certificate is designated from the Subject field.</p>
 					</div>
 				</div>
 

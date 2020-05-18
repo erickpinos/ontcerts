@@ -109,7 +109,7 @@ const data = {
   claimSerialized
 }
 
-let res = await axios.post("/verify/verifyExpiration", data);
+let res = await axios.post("/verify/verifyNotRevoked", data);
 const result = res.data;
 return result;
 
