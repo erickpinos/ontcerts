@@ -297,9 +297,9 @@ export default class Certificate extends React.Component {
 					<Tab.Content>
 
 	        	<Tab.Pane eventKey="basic">
-							<div class="row no-gutters">
+							<div class="row justify-content-center no-gutters">
 
-								<div class="col-md-3 justify-content-center">
+								<div class="col-3 justify-content-center">
 									<img src={degreeIcon} class="card-img p-3" />
 								</div>
 
