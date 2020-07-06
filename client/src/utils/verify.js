@@ -20,12 +20,15 @@ export async function verify(claimSerialized) {
 
   var result = '';
 
+  console.log('test here first', result);
+
   let res = await axios.post("/verify", data);
 
   console.log('axios res', res);
   console.log('axios /verify res.data', res.data);
   result = res.data;
 
+  console.log('lalatest result', result);
   return result;
 /*
   console.log('verify claim', claim);

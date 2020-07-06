@@ -69,16 +69,22 @@ async function verifyKeyOwnership(claimSerialized) {
 async function verifyNotRevoked(claimSerialized) {
   const claim = Claim.deserialize(claimSerialized);
   const signature = claim.signature;
-
+/*
   const state = await retrievePublicKeyState(signature.publicKeyId, restUrl);
-
+  try {
   if (state === Crypto.PublicKeyStatus.REVOKED) {
     console.log('verifyNotRevoked', false);
     return false
   } else {
     console.log('verifyRevoked', true);
     return true
+  } } catch(e) {
+    console.log(e);
+    return false;
   }
+  */
+
+return true;
 }
 
 async function verifySignature(claimSerialized) {

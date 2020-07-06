@@ -11,7 +11,7 @@
     "bootstrap": "^4.5.0",
     "cyanobridge": "^0.1.3",
     "ontology-dapi": "^0.4.9",
-    "ontology-ts-sdk": "^1.1.1",
+    "ontology-ts-sdk": "^1.1.4",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",

@@ -10,6 +10,7 @@ import Issuers from './pages/Issuers';
 import ViewCertificates from './pages/ViewCertificates';
 import IssueCertificate from './pages/IssueCertificate';
 import GettingStarted from './pages/GettingStarted';
+import Test from './pages/Test';
 
 import { getAccount, getIdentity } from './utils/ontology';
 
@@ -105,6 +106,7 @@ export default class App extends React.Component {
 							<Route path="/issuers" component={Issuers}/>
 							<Route path="/issue-certificate" component={IssueCertificate}/>
 							<Route path="/view-certificates" component={ViewCertificates}/>
+							<Route path="/test" component={Test}/>
 						</Switch>
 					</div>
 

@@ -90,9 +90,10 @@ export default class IssueCertificate extends React.Component {
 
 		const subject = this.state.certSubject;
 
-		const result = await issueClaimDapi(claim, subject, this.state.issuerPrivateKey);
+		console.log('testLala1');
+  	const result = await issueClaimDapi(claim, subject, this.state.issuerPrivateKey);
 		console.log('issueClaim result', result);
-
+		console.log('testLala2');
 
 		const txHash = result[1];
 

@@ -19,6 +19,9 @@ const socketUrl = 'ws://polaris1.ont.io:20335';
 const { verify, verifyExpiration, verifyKeyOwnership, verifyNotRevoked,
 	verifySignature, verifyMatchingClaimId, verifyAttestStatus } = require('./verify');
 
+const { getDDO, addAttributes, getDocument, getAttributes, registerOntId,
+regIdWithAttributes, removeAttribute } = require('./identity');
+
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
   console.error(`Node cluster master ${process.pid} is running`);
@@ -71,6 +74,7 @@ if (!isDev && cluster.isMaster) {
   });
 
   app.post('/verify', async function (req, res) {
+		console.log("test--------------------------------------------------");
     const result = await verify(req.body.claimSerialized);
     res.send(result);
   });
@@ -106,6 +110,49 @@ if (!isDev && cluster.isMaster) {
     const result = await verifyAttestStatus(req.body.claimSerialized);
     res.send(result);
   });
+
+	app.post('/identity/getDDO', async function (req, res) {
+		console.log('req.body', req.body);
+    const result = await getDDO(req.body.identity);
+    res.send(result);
+  });
+
+	app.post('/identity/getDocument', async function (req, res) {
+		console.log('req.body', req.body);
+    const result = await getDocument(req.body.identity);
+    res.send(result);
+  });
+
+	app.post('/identity/addAttributes', async function (req, res) {
+		console.log('req.body', req.body);
+    const result = await addAttributes(req.body.identity, req.body.payerAddress, req.body.attributes);
+    res.send(result);
+  });
+
+	app.post('/identity/getAttributes', async function (req, res) {
+		console.log('req.body', req.body);
+		const result = await getAttributes(req.body.identity);
+		res.send(result);
+	});
+
+	app.post('/identity/registerOntId', async function (req, res) {
+		console.log('req.body', req.body);
+		const result = await registerOntId();
+		res.send(result);
+	});
+
+
+	app.post('/identity/regIdWithAttributes', async function (req, res) {
+		console.log('req.body', req.body);
+	  const result = await regIdWithAttributes(req.body.attributes);
+	  res.send(result);
+	});
+
+	app.post('/identity/removeAttribute', async function (req, res) {
+		console.log('req.body', req.body);
+	  const result = await removeAttribute();
+	  res.send(result);
+	});
 
   app.use(express.static(path.resolve(__dirname, '../client/public')));
 
